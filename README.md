@@ -1,79 +1,79 @@
-#mkEqSFC
+# mkEqSFC
 [English README is here](https://github.com/quick-waipa/mkEqSFC/blob/main/README_ENG.md)
 
 ***
 - Ver.1.00 2024/04/15
- - �V�K�����[�X
-- �e�X�g��: 
+ - 新規リリース
+- テスト環境: 
  - Windows 10 22H2 (Python 3.11.5)
  - Ubuntu 22.04.3 LTS (Python 3.10.12)
   
 ***
-##�����F
+## 説明：
 
-�X�s�[�J�[�̎��g�������f�[�^�����ɁA����␳�p��EQ�f�[�^�𐶐�����v���O�����ł��B
-�]���̉���␳�ł͒P���ȃt���b�g�����i���邢�͒P���ɑ����̌X�����������́j���^�[�Q�b�g�ɃC�R���C�W���O���Ă���A���ʂƂ��ĕ␳��̉����܂�����������񂾂艹�����򉻂��ĕ��������肵�Ă��܂������A���̃v���O�����ł͓����E�h�l�X�Ȑ��Ȃǂ̃t�B���^�[��K�p���A��萸���ȃ^�[�Q�b�g��ݒ肷�邱�ƂŁA���u�l�ԓI�Ɏ��̗ǂ��v�␳���\�ƂȂ��Ă��܂��B
+スピーカーの周波数特性データを元に、音場補正用のEQデータを生成するプログラムです。
+従来の音場補正では単純なフラット特性（あるいは単純に多少の傾きをつけたもの）をターゲットにイコライジングしており、結果として補正後の音が曇ったり引っ込んだり音質が劣化して聞こえたりしていましたが、このプログラムでは等ラウドネス曲線などのフィルターを適用し、より精密なターゲットを設定することで、より「人間的に質の良い」補正が可能となっています。
 
 
-��{�I�Ȏg�����͈ȉ��̒ʂ�ł��B
+基本的な使い方は以下の通りです。
 
-- �܂��A�C���v�b�g�f�[�^�Ƃ��ăX�s�[�J�[�̎��g�������f�[�^��p�ӂ���i���g��[Hz]�A�Q�C��[dB]�A�J���}��؂�f�[�^�t�@�C���j�B���F20Hz�`20000Hz�̃f�[�^���Ȃ��ƃG���[�ɂȂ�܂��B
-- mkEqSFC.exe���N�����A�e����͂�ݒ肷��B
-- �uRun Calculate�v�{�^���������Čv�Z�����s�B�A�E�g�v�b�g�Ƃ��Ĉȉ����o�͂���܂��B
+- まず、インプットデータとしてスピーカーの周波数特性データを用意する（周波数[Hz]、ゲイン[dB]、カンマ区切りデータファイル）。注：20Hz～20000Hzのデータがないとエラーになります。
+- mkEqSFC.exeを起動し、各種入力を設定する。
+- 「Run Calculate」ボタンを押して計算を実行。アウトプットとして以下が出力されます。
 
-  - �����t�B���^�[�K�p��̎��g�������f�[�^
-  - �e��v���b�g�摜�t�@�C���i.png�j
-  - 2��ނ�EQ�ݒ�t�@�C��(REW�G�N�X�|�[�g�t�@�C���`��)
-  - EQ�K�p�O���RMS�l�̕ω��irms.txt�j
+  - 特性フィルター適用後の周波数特性データ
+  - 各種プロット画像ファイル（.png）
+  - 2種類のEQ設定ファイル(REWエクスポートファイル形式)
+  - EQ適用前後のRMS値の変化（rms.txt）
 
-- Equalizer APO�Ȃǂ̃\�t�g��EQ�t�@�C����K�p���܂��B
+- Equalizer APOなどのソフトでEQファイルを適用します。
 
-�����ŁA2��ނ�EQ�ݒ�t�@�C���ɂ��Đ������܂��B
-EQ�ݒ�t�@�C���͈ȉ���2��ނ��o�͂���܂��B
+ここで、2種類のEQ設定ファイルについて説明します。
+EQ設定ファイルは以下の2種類が出力されます。
 
-- �I���W�i���̎��g�������f�[�^�ɑ΂��鉹��␳�pEQ�f�[�^
-- �����t�B���^�[(�Ⴆ�Γ����E�h�l�X�Ȑ�)��K�p�������g�������f�[�^�ɑ΂��鉹��␳�pEQ�f�[�^
+- オリジナルの周波数特性データに対する音場補正用EQデータ
+- 特性フィルター(例えば等ラウドネス曲線)を適用した周波数特性データに対する音場補正用EQデータ
 
-����2��ނ�EQ�ɂ��␳��K�؂Ȋ����Ń~�b�N�X���邱�ƂŁA���ǂ�����␳�������ł���A�Ƃ����l���ł��B
-���Ƃ���Equalizer APO�ł͓��͉������ɂ킯�Ă��ꂼ��قȂ���EQ��K�p���A�ēx�~�b�N�X����A�Ƃ������Ƃ��\�ł��B
-�~�b�N�X����ہA�Q�C�������̂��߂�rms.txt�ɋL�ڂ��ꂽRMS[<sup>1</sup>]�̕ω��l���Q�l�ɂ��Ă��������B
+この2種類のEQによる補正を適切な割合でミックスすることで、より良い音場補正が実現できる、という考えです。
+たとえばEqualizer APOでは入力音声を二つにわけてそれぞれ異なったEQを適用し、再度ミックスする、ということが可能です。
+ミックスする際、ゲイン調整のためにrms.txtに記載されたRMS[<sup>1</sup>]の変化値を参考にしてください。
 
-[<sup>1</sup>]: ���ۂ̓V���v�\���ϕ������Ă���̂�RMS�l�ł͂Ȃ��ł����֋X��RMS�ƌĂԂ��Ƃɂ��܂�
+[<sup>1</sup>]: 実際はシンプソン積分をしているのでRMS値ではないですが便宜上RMSと呼ぶことにします
 
 ***
-##���̓f�[�^�F  
-�e���̓f�[�^�ɂ��Đ������܂��B  
-####[Output Folder]
- + **Output Folder Path:** �o�͂����t�@�C�����i�[����t�H���_�̃p�X����͂��ĉ�����
+## 入力データ：  
+各入力データについて説明します。  
+#### [Output Folder]
+ + **Output Folder Path:** 出力されるファイルを格納するフォルダのパスを入力して下さい
  
-####[Input Data]
- + **Speaker FR Data File Path:** �f�[�^�`���FHz, Gain�F�J���}��؂�B�X�s�[�J�[�̎��g�������f�[�^�̃t�@�C���p�X����͂��ĉ������B���ΓI�ȃQ�C�����x���͂ǂ̂��炢�ł��v�Z��͖�肠��܂��񂪁A�v���b�g�̕`��͈͂�����̂�0dB�t�߂ɂȂ�悤�ɒ����������������ł��傤�B
- + **Filter Data File Path:** �f�[�^�`���FHz Gain�F�X�y�[�X��؂�B�����t�B���^�[�i�����E�h�l�X�Ȑ��Ȃǁj�̃t�@�C���p�X����͂��ĉ������BISO 226:2023��75phon�ɂ�����f�[�^��p�ӂ��Ă���̂ł���𗘗p����Ƃ悢�ł��傤(ISO_226_2023_75phon.txt)�B
- + **EQ Target Curve File Path: Data Format:** �f�[�^�`���FHz, Gain�F�J���}��؂�BEQ���쐬����ۂɃ^�[�Q�b�g�ƂȂ�J�[�u�̃t�@�C���p�X����͂��ĉ������B����͕ςɌX������������t���b�g�ȕ�����肭�����C�����܂�(target_curve_Flat.txt)�B
+#### [Input Data]
+ + **Speaker FR Data File Path:** データ形式：Hz, Gain：カンマ区切り。スピーカーの周波数特性データのファイルパスを入力して下さい。相対的なゲインレベルはどのくらいでも計算上は問題ありませんが、プロットの描画範囲があるので0dB付近になるように調整した方がいいでしょう。
+ + **Filter Data File Path:** データ形式：Hz Gain：スペース区切り。特性フィルター（等ラウドネス曲線など）のファイルパスを入力して下さい。ISO 226:2023の75phonにおけるデータを用意してあるのでそれを利用するとよいでしょう(ISO_226_2023_75phon.txt)。
+ + **EQ Target Curve File Path: Data Format:** データ形式：Hz, Gain：カンマ区切り。EQを作成する際にターゲットとなるカーブのファイルパスを入力して下さい。これは変に傾きをつけるよりもフラットな方が上手くいく気がします(target_curve_Flat.txt)。
  
-####[Output File Name]
- + **Filter Applied FR Data File Name:** �����t�B���^�[��K�p������̎��g�������f�[�^���o�͂����̂ŁA���̃t�@�C���������߂ē��͂��ĉ������B
- + **EQ(Normal FR)File Name:** EQ�f�[�^�i�ʏ�̎��g�������j���o�͂����̂ŁA���̃t�@�C���������߂ē��͂��ĉ������B
- + **EQ(Filtered FR)File Name:** EQ�f�[�^�i�t�B���^�[��̎��g�������j���o�͂����̂ŁA���̃t�@�C���������߂ē��͂��ĉ������B
+#### [Output File Name]
+ + **Filter Applied FR Data File Name:** 特性フィルターを適用した後の周波数特性データが出力されるので、そのファイル名を決めて入力して下さい。
+ + **EQ(Normal FR)File Name:** EQデータ（通常の周波数特性）が出力されるので、そのファイル名を決めて入力して下さい。
+ + **EQ(Filtered FR)File Name:** EQデータ（フィルター後の周波数特性）が出力されるので、そのファイル名を決めて入力して下さい。
  
-####[Application of Characteristic Filter to Frequency Response]
- + **Slope [dB/oct]:** ���i�����Ă��鉹�y���ǂ̒��x�X���[�v�������ɂ���Ēl��ς��ĉ������B���ɂ�����肪�Ȃ��ꍇ�A�s���N�m�C�Y�̒l��ݒ肷��̂��ǂ��Ǝv���܂�(-3 dB/oct)�B
+#### [Application of Characteristic Filter to Frequency Response]
+ + **Slope [dB/oct]:** 普段聴いている音楽がどの程度スロープを持つかによって値を変えて下さい。特にこだわりがない場合、ピンクノイズの値を設定するのが良いと思います(-3 dB/oct)。
  
-####[Make EQ Curve]
- + **Band Number:** �쐬����EQ�̃o���h������͂��ĉ������B
- + **Max Q [-]:** Q�l�̍ő�l��ݒ肵�ĉ������B
- + **Min Q [-]:** Q�l�̍ŏ��l��ݒ肵�ĉ������B
- + **Default Q [-]:** �v�Z���G���[�ɂȂ����Ƃ��ɂƂ肠�����ݒ肷��Q�l�ł��B4���炢�ɂ��Ă����΂����C�����܂��B
- + **Low Cutoff(Normal FR) [Hz]:** EQ�i�ʏ�̎��g������Ver.�j�쐬���Ɏg�p������g�������f�[�^�̎��g���̉����l��ݒ肵�ĉ������B
- + **High Cutoff(Normal FR) [Hz]:** EQ�i�ʏ�̎��g������Ver.�j�쐬���Ɏg�p������g�������f�[�^�̎��g���̏���l��ݒ肵�ĉ������B
- + **Low Cutoff(Filtered FR) [Hz]:** EQ�i�t�B���^�[��̎��g������Ver.�j�쐬���Ɏg�p������g�������f�[�^�̎��g���̉����l��ݒ肵�ĉ������B
- + **High Cutoff(Filtered FR) [Hz]:** EQ�i�t�B���^�[��̎��g������Ver.�j�쐬���Ɏg�p������g�������f�[�^�̎��g���̏���l��ݒ肵�ĉ������B
- + **Window Octave [oct]:** EQ�쐬���Ɏ��g�������f�[�^�̉��ʂ��K�E�X�֐��Ńt�B�b�e�B���O����̂ł����A���̍ۂɃT���v�����O������g������ݒ肵�܂��B�Ƃ肠����0.1oct���炢�ɂ��Ă����΂����C�����܂��B
- + **EQ Creating Target Level [dB]:** EQ�쐬���̃^�[�Q�b�g���x����ݒ肵�ĉ������B
+#### [Make EQ Curve]
+ + **Band Number:** 作成するEQのバンド数を入力して下さい。
+ + **Max Q [-]:** Q値の最大値を設定して下さい。
+ + **Min Q [-]:** Q値の最小値を設定して下さい。
+ + **Default Q [-]:** 計算がエラーになったときにとりあえず設定するQ値です。4くらいにしておけばいい気がします。
+ + **Low Cutoff(Normal FR) [Hz]:** EQ（通常の周波数特性Ver.）作成時に使用する周波数特性データの周波数の下限値を設定して下さい。
+ + **High Cutoff(Normal FR) [Hz]:** EQ（通常の周波数特性Ver.）作成時に使用する周波数特性データの周波数の上限値を設定して下さい。
+ + **Low Cutoff(Filtered FR) [Hz]:** EQ（フィルター後の周波数特性Ver.）作成時に使用する周波数特性データの周波数の下限値を設定して下さい。
+ + **High Cutoff(Filtered FR) [Hz]:** EQ（フィルター後の周波数特性Ver.）作成時に使用する周波数特性データの周波数の上限値を設定して下さい。
+ + **Window Octave [oct]:** EQ作成時に周波数特性データの凹凸をガウス関数でフィッティングするのですが、その際にサンプリングする周波数幅を設定します。とりあえず0.1octくらいにしておけばいい気がします。
+ + **EQ Creating Target Level [dB]:** EQ作成時のターゲットレベルを設定して下さい。
  
 ***
-##�C���X�g�[�����K�v�ȃ��C�u�����F
-�ȉ��̃��C�u�������C���X�g�[�����Ă��������B
+## インストールが必要なライブラリ：
+以下のライブラリをインストールしてください。
 
 - pandas: 
 - yaml: 
@@ -82,22 +82,22 @@ EQ�ݒ�t�@�C���͈ȉ���2��ނ��o�͂���܂��B
 - numpy: 
 - gnuplot:
 
-�C���X�g�[���ɂ͈ȉ��̃o�b�`�t�@�C��/�V�F���������p�������B
+インストールには以下のバッチファイル/シェルをご利用下さい。
 - Windows: install_win.bat
 - Linux: install_linux.sh
 
-���s�R�}���h�͈ȉ��ł��B  
+実行コマンドは以下です。  
 `python mkEqSFC.py`
 
-���F`config.yaml`�͎��s�t�@�C���Ɠ����t�H���_�ɓ���Ă��������B  
-���FLinux�Ŏ��s����ꍇ�A`mkEqSFC.py` �� `create_gui()` �֐����̓��{��t�H���g����������������������������܂���B
+注：`config.yaml`は実行ファイルと同じフォルダに入れてください。  
+注：Linuxで実行する場合、`mkEqSFC.py` の `create_gui()` 関数内の日本語フォントを書き換えた方がいいかもしれません。
 
 ***
-##�쐬�ҁF
-- �N�C�b�N�d�h
+## 作成者：
+- クイック賄派
 - HP: https://quickwaipa.web.fc2.com/
 - E-Mail: quickwaipa@gmail.com
 
-##���C�Z���X
+## ライセンス
 Copyright (c) 2024 Quick-Waipa  
 This software is released under the MIT License, see LICENSE.
