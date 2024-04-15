@@ -99,9 +99,9 @@ def open_file_dialog(entry_widget):
 def open_folder_dialog(entry_widget):
     path = Path(entry_widget.get())
     if path:
-        folder_path = filedialog.askopenfilename(initialdir=path)
+        folder_path = filedialog.askdirectory(initialdir=path)
     else:
-        folder_path = filedialog.askopenfilename(initialdir=Path.cwd())
+        folder_path = filedialog.askdirectory(initialdir=Path.cwd())
         
     if folder_path:
         entry_widget.delete(0, tk.END)  # エントリウィジェットの現在の内容を削除
