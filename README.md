@@ -3,10 +3,10 @@
 
 ***
 - Ver.1.00 2024/04/15
- - 新規リリース
+   - 新規リリース
 - テスト環境: 
- - Windows 10 22H2 (Python 3.11.5)
- - Ubuntu 22.04.3 LTS (Python 3.10.12)
+   - Windows 10 22H2 (Python 3.11.5)
+   - Ubuntu 22.04.3 LTS (Python 3.10.12)
   
 ***
 ## 説明：
