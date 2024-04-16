@@ -291,6 +291,7 @@ def calculate():
             'target_path':target_path,
             'out':'',
             'output_folder':output_folder,
+            'target_on':True,
     }
     eqMk.eqMk(data)
     
@@ -311,6 +312,7 @@ def calculate():
             'target_path':target_path,
             'out':'f_',
             'output_folder':output_folder,
+             'target_on':False,
     }
     eqMk.eqMk(data2)
     

@@ -343,6 +343,8 @@ def eqMk(data):
     
     out = data['out']
     output_folder = data['output_folder']
+    
+    target_on = data['target_on']
 
     #=======================================================================
     
@@ -361,7 +363,10 @@ def eqMk(data):
     
     interpolator = interp1d(np.log10(df_t['freq']), df_t['gain'], kind='linear', fill_value="extrapolate")
     t_curve = interpolator(np.log10(freqs))
-    t_curve = t_curve + target
+    if target_on:
+        t_curve = t_curve + target
+    else:
+        t_curve = np.zeros_like(freqs) + target
     df_t_curve = pd.DataFrame({'freq':freqs, 'gain':t_curve})
     
     q_values = []
