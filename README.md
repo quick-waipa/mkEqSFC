@@ -1,9 +1,14 @@
 # mkEqSFC
-[English README is here](https://github.com/quick-waipa/mkEqSFC/blob/main/README_ENG.md)
+[English README is here](https://github.com/quick-waipa/mkEqSFC/blob/main/README_ENG.md)  
 
+note記事：スピーカーの音場補正プログラムを自作してみた：  
+https://note.com/waipa/n/ncecf0fcbd168
+    
 ***
 - Ver.1.00 2024/04/15
    - 新規リリース
+- Ver.1.01 2024/04/16
+   - ターゲットカーブファイルを通常の周波数特性データのみに適用するようにmkEqSFC.pyとeqMk.pyの内容を変更。
 - テスト環境: 
    - Windows 10 22H2 (Python 3.11.5)
    - Ubuntu 22.04.3 LTS (Python 3.10.12)

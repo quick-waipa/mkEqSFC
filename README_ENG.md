@@ -1,9 +1,14 @@
 # mkEqSFC
 [日本語版 README はこちら](https://github.com/quick-waipa/mkEqSFC/blob/main/README.md)
 
+note article： I created my own sound field correction program for speakers (Japanese).：  
+https://note.com/waipa/n/ncecf0fcbd168
+
 ***
 - Ver.1.00 2024/04/15
     - initial release
+- Ver.1.01 2024/04/16
+    - Changed the contents of the mkEqSFC.py and eqMk.py so that the target curve file applies only to normal frequency response data.
 - Test Environment: 
    - Windows 10 22H2 (Python 3.11.5)
    - Ubuntu 22.04.3 LTS (Python 3.10.12)
