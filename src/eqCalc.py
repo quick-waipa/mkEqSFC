@@ -12,6 +12,35 @@ from pathlib import Path
 from scipy.integrate import simps
 from scipy.interpolate import interp1d
 
+def linear_interpolation(freq, gain, target_freq):
+    # freqの中でtarget_freqに最も近い2つの周波数を見つける
+    idx = 0
+    while idx < len(freq) - 1 and freq[idx + 1] < target_freq:
+        idx += 1
+    
+    # 線形補間
+    if idx == len(freq) - 1:  # 最後の要素の場合
+        interpolated_gain = gain[idx]
+    else:
+        # 2つの周波数と対応するgainを取得
+        freq_lower, freq_upper = freq[idx], freq[idx + 1]
+        gain_lower, gain_upper = gain[idx], gain[idx + 1]
+        
+        # 線形補間
+        interpolated_gain = gain_lower + (gain_upper - gain_lower) * ((target_freq - freq_lower) / (freq_upper - freq_lower))
+    
+    return interpolated_gain
+
+#特に根拠はないがエンジニアリングセンスによってターゲットカーブのローとハイを削る関数
+def engineering_sense(freq, gain):
+    a_low = [-30, 4, 1.5, 0.2]
+    a_hi  = [-2, 6, 1.5, 5]
+    
+    gain_out = gain + a_low[0]*(a_low[2]/np.log10(freq) - a_low[3])**a_low[1] + a_hi[0]*(a_hi[2]/(np.log10(freq) - a_hi[3]))**a_hi[1]
+    
+    return gain_out
+    
+
 # file read and setting--------------------------------------------------------------
 def read_eq_settings(file_path):
     frequencies = []
@@ -231,7 +260,7 @@ def eqCalc(eq_path, target_path, k_filter_path, slope):
     
     return rms_k, rms_f, rms_diff
     
-def specCalc(file2_path, file3_path, output_folder, out_path, slope):
+def specCalc(file2_path, file3_path, output_folder, slope):
     
     f_range = np.logspace(np.log10(20), np.log10(20000), 1000)
     
@@ -248,9 +277,16 @@ def specCalc(file2_path, file3_path, output_folder, out_path, slope):
     
     k_filter_curve2 = apply_slope(k_filter_curve, slope_curve)
     
+    #target_curve_eqLoudness = -k_filter_curve2
+    target_curve_eqLoudness = engineering_sense(f_range, -k_filter_curve2) #エンジニアリングセンスによりローとハイを削ったもの
+    
+    gain_tmp = linear_interpolation(f_range, target_curve_eqLoudness, 1000)
+    target_curve_eqLoudness_std = target_curve_eqLoudness - gain_tmp
+    
     target_curve = apply_filter(k_filter_curve2, msp3_curve)
     
     
-    data = np.column_stack((f_range, msp3_curve, slope_curve, k_filter_curve, k_filter_curve2, target_curve))
-    np.savetxt(out_path, data[:,[0,5]], delimiter=',', fmt='%.6f')
+    data = np.column_stack((f_range, msp3_curve, slope_curve, k_filter_curve, k_filter_curve2, target_curve, target_curve_eqLoudness_std))
+    #np.savetxt(out_path, data[:,[0,5]], delimiter=',', fmt='%.6f')
+    np.savetxt(output_folder.resolve().joinpath("target_curve_eqLoudness.txt"), data[:,[0,6]], delimiter=',', fmt='%.6f')
     plot_eq_curve(data, output_folder)

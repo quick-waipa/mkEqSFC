@@ -15,7 +15,7 @@ from pathlib import Path
 import eqCalc
 import eqMk
 
-Ver = "1.00"
+Ver = "1.02"
 
 # ウィンドウを閉じた際にPythonを終了する
 def close_window():
@@ -38,7 +38,7 @@ def load_yaml():
         'data_file',
         'k_file',
         'target_file',
-        'out',
+        #'out',
         'eq1_file',
         'eq2_file',
         'slope',
@@ -122,7 +122,7 @@ def create_gui():
     font_jp = ("Meiryo", 10)
     
     # ウィンドウのサイズ
-    root.geometry("990x960")
+    root.geometry("990x920")
     
     #テーマ
     #s = ttk.Style()
@@ -141,16 +141,16 @@ def create_gui():
     ttk.Label(parent, text=' [Output Folder] --------------------------------------------------------------------------------------------------------------------------', font=font_b).grid(row=0, column=0, columnspan=3, sticky="w", pady=5, padx=0)
     ttk.Label(parent, text=' [Input Data] -----------------------------------------------------------------------------------------------------------------------------', font=font_b).grid(row=2, column=0, columnspan=3, sticky="w", pady=5, padx=0)
     ttk.Label(parent, text=' [Output File Name] -----------------------------------------------------------------------------------------------------------------------', font=font_b).grid(row=6, column=0, columnspan=3, sticky="w", pady=5, padx=0)
-    ttk.Label(parent, text=' [Application of Characteristic Filter to Frequency Respons] ------------------------------------------------------------------------------', font=font_b).grid(row=10, column=0, columnspan=3, sticky="w", pady=5, padx=0)
-    ttk.Label(parent, text=' [Make EQ Curves] -------------------------------------------------------------------------------------------------------------------------', font=font_b).grid(row=12, column=0, columnspan=3, sticky="w", pady=5, padx=0)
-    ttk.Label(parent, text=' ', font=font_b).grid(row=23, column=0, columnspan=3, sticky="w", pady=0, padx=0)
+    ttk.Label(parent, text=' [Application of Characteristic Filter to Frequency Respons] ------------------------------------------------------------------------------', font=font_b).grid(row=9, column=0, columnspan=3, sticky="w", pady=5, padx=0)
+    ttk.Label(parent, text=' [Make EQ Curves] -------------------------------------------------------------------------------------------------------------------------', font=font_b).grid(row=11, column=0, columnspan=3, sticky="w", pady=5, padx=0)
+    ttk.Label(parent, text=' ', font=font_b).grid(row=22, column=0, columnspan=3, sticky="w", pady=0, padx=0)
     
     entry_frames = []
     
     # 各データを表示
     row_index = 0
     for key in parameter_order:
-        if row_index == 0 or row_index == 2 or row_index == 6 or row_index == 10 or row_index == 10 or row_index == 12:
+        if row_index == 0 or row_index == 2 or row_index == 6 or row_index == 9 or row_index == 11:
             row_index += 1
         
         value = data_config.get(key, "")
@@ -225,7 +225,7 @@ def calculate():
     output_folder = Path(config['output_folder'])
     k_file     = Path(config['k_file'])      #なんらかの特性フィルター（等LOUDNESS曲線など）のデータ
     data_file  = Path(config['data_file'])   #入力データのファイル名を指定。周波数特性データ。 ※20～20000Hzのデータがないとエラーになる
-    out        = str(config['out'])         #アウトプットファイル名を指定。slopeと特性フィルターを適用した周波数特性データ
+    #out        = str(config['out'])         #アウトプットファイル名を指定。slopeと特性フィルターを適用した周波数特性データ
     slope      = float(config['slope'])       #ターゲット生成につかうスロープ[dB/oct] (ピンクノイズ:-3dB/oct)
     #================================================================================
     band_num  =  int(config['band_num'])    # EQバンド数
@@ -253,10 +253,11 @@ def calculate():
     script_dir = Path.cwd()
     
     # ファイルパスを絶対パス化
-    file2_path  = k_file.resolve()
-    file3_path  = data_file.resolve()
-    target_path = target_file.resolve()
-    out_path    = output_folder.resolve().joinpath(out)
+    file2_path   = k_file.resolve()
+    file3_path   = data_file.resolve()
+    target_path  = target_file.resolve()
+    target2_path = output_folder.resolve().joinpath("target_curve_eqLoudness.txt")
+    #out_path     = output_folder.resolve().joinpath(out)
     
     print("================================================================================")
     print("================================================================================")
@@ -271,7 +272,7 @@ def calculate():
     
     
     # eqCalc.pyでslope+等ラウドネス曲線を適用した周波数特性データを作成=========
-    eqCalc.specCalc(file2_path, file3_path, output_folder, out_path, slope)
+    eqCalc.specCalc(file2_path, file3_path, output_folder, slope)
     
     # EQデータ作成=======================================================
     # フラットターゲット--------------------------------------------------
@@ -299,7 +300,8 @@ def calculate():
     eq2_path   = output_folder.joinpath(eq2_file)
     
     data2 = {'band_num':band_num,
-            'file_path':out_path,
+            #'file_path':out_path,
+            'file_path':file3_path,
             'out_path':eq2_path,
             'model_str':model_str,
             'max_q':max_q,
@@ -309,10 +311,10 @@ def calculate():
             'low_cutoff':low_cutoff2,
             'high_cutoff':high_cutoff2,
             'target':target,
-            'target_path':target_path,
+            'target_path':target2_path,
             'out':'f_',
             'output_folder':output_folder,
-             'target_on':False,
+            'target_on':True,
     }
     eqMk.eqMk(data2)
     
@@ -375,7 +377,7 @@ def main():
         'output_folder': ' Output Folder Path',
         'k_file': ' Filter Data File Path',
         'data_file': ' Speaker FR Data File Path',
-        'out': ' Filter Applied FR Data File Name',
+        #'out': ' Filter Applied FR Data File Name',
         'slope': ' Slope [dB/oct]',
         'band_num': ' Band Number',
         'eq1_file': ' EQ (Normal FR) File Name',
@@ -397,7 +399,7 @@ def main():
         'output_folder': '',
         'k_file': '',
         'data_file': '',
-        'out': '特性フィルター適用後の周波数特性データの保存ファイル名',
+        #'out': '特性フィルター適用後の周波数特性データの保存ファイル名',
         'slope': 'リファレンス音源のスロープ。(参考：ピンクノイズ：-3 dB/oct)',
         'band_num': 'EQバンド数',
         'eq1_file': 'EQデータ（通常Ve.）の保存ファイル名',
@@ -417,7 +419,8 @@ def main():
     # ファイルパスを選択できるデータのキー
     folder_path_keys = ['output_folder']
     file_path_keys = ['k_file', 'data_file', 'target_file']
-    file_name_keys = ['out','eq1_file','eq2_file']
+    #file_name_keys = ['out','eq1_file','eq2_file']
+    file_name_keys = ['eq1_file','eq2_file']
     create_gui()
     
     
