@@ -1,12 +1,12 @@
 Filter Settings file
 
 Room EQ V5.31
-Dated: 2024/04/15 15:43:37
+Dated: 2024/04/17 18:27:19
 
 Notes:
 
 Equaliser: Generic
-FR Data Used: ./input_data/sample_FR_data.txt
+FR Data Used: ../input_data/sample_FR_data.txt
 Filter 1: ON  PK  Fc  191.66 Hz  Gain  8.69 dB  Q  3.358
 Filter 2: ON  PK  Fc  1204.41 Hz  Gain  -8.04 dB  Q  8.000
 Filter 3: ON  PK  Fc  80.15 Hz  Gain  -7.02 dB  Q  8.000
