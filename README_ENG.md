@@ -55,7 +55,6 @@ When mixing, please refer to the RMS value in the rms.txt file to adjust the gai
  + **EQ Target Curve File Path: Data Format:** Hz, Gain (comma-separated). Please input the file path of the curve that serves as the target when creating EQ. It's suggested to use a flat curve rather than adding any tilt (target_curve_Flat.txt).
  
 #### [Output File Name]
- + **Filter Applied FR Data File Name:** Input the file name for the frequency response data after applying the characteristic filter.
  + **EQ(Normal FR)File Name:** Input the file name for the EQ data (normal frequency response).
  + **EQ(Filtered FR)File Name:** Input the file name for the EQ data (frequency response after filtering).
  

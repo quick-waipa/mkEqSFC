@@ -59,7 +59,6 @@ EQ設定ファイルは以下の2種類が出力されます。
  + **EQ Target Curve File Path: Data Format:** データ形式：Hz, Gain：カンマ区切り。EQを作成する際にターゲットとなるカーブのファイルパスを入力して下さい。これは変に傾きをつけるよりもフラットな方が上手くいく気がします(target_curve_Flat.txt)。
  
 #### [Output File Name]
- + **Filter Applied FR Data File Name:** 特性フィルターを適用した後の周波数特性データが出力されるので、そのファイル名を決めて入力して下さい。
  + **EQ(Normal FR)File Name:** EQデータ（通常の周波数特性）が出力されるので、そのファイル名を決めて入力して下さい。
  + **EQ(Filtered FR)File Name:** EQデータ（フィルター後の周波数特性）が出力されるので、そのファイル名を決めて入力して下さい。
  
