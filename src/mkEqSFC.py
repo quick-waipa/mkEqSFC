@@ -15,7 +15,7 @@ from pathlib import Path
 import eqCalc
 import eqMk
 
-Ver = "1.02"
+Ver = "1.03"
 
 # ウィンドウを閉じた際にPythonを終了する
 def close_window():

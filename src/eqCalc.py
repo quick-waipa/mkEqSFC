@@ -65,8 +65,8 @@ def read_k_settings(file_path):
     gains = []
     with open(file_path, 'r') as file:
         for line in file:
-            freq = float(line.split()[0])
-            gain = float(line.split()[1])
+            freq = float(re.split(r'[, \t]+', line)[0])
+            gain = float(re.split(r'[, \t]+', line)[1])
             frequencies.append(freq)
             gains.append(gain)
             #print("freq: ",freq," gain: ",gain)
@@ -79,8 +79,8 @@ def read_msp3(file_path):
     with open(file_path, 'r') as file:
         i = 0
         for line in file:
-            freq = float(line.split(', ')[0])
-            gain = float(line.split(', ')[1])
+            freq = float(re.split(r'[, \t]+', line)[0])
+            gain = float(re.split(r'[, \t]+', line)[1])
             if len(frequencies) != 0:
                 freq_pre = frequencies[len(frequencies) - 1]
             else:
