@@ -9,6 +9,8 @@ https://note.com/waipa/n/ncecf0fcbd168
     - initial release
 - Ver.1.01 2024/04/16
     - Changed the contents of the mkEqSFC.py and eqMk.py so that the target curve file applies only to normal frequency response data.
+- Ver.1.02 2024/04/17
+   - Changed so that EQ is calculated after creating a filtered target curve.
 - Test Environment: 
    - Windows 10 22H2 (Python 3.11.5)
    - Ubuntu 22.04.3 LTS (Python 3.10.12)
@@ -25,7 +27,7 @@ The basic usage is as follows
 - Start mkEqSFC.exe and set various inputs.
 - Press the "Run Calculate" button to execute the calculation. The following will be output as output.
 
-  - Frequency response data after applying the characteristic filter
+  - Target Curve data after applying the characteristic filter
   - Various plot image files (.png)
   - Two EQ setting files (REW export file format)
   - RMS value changes before and after EQ application (rms.txt)
