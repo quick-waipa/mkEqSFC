@@ -13,6 +13,8 @@ https://note.com/waipa/n/ncecf0fcbd168
    - フィルター適用済みターゲットカーブを作成してからEQを計算するように変更。
 - Ver.1.03 2024/04/18
    - 普通のcsvファイルが読めるように修正。
+- Ver.1.04 2024/04/18
+   - グラフの描画をmatplotlibに変更。
 - テスト環境: 
    - Windows 10 22H2 (Python 3.11.5)
    - Ubuntu 22.04.3 LTS (Python 3.10.12)
@@ -88,7 +90,7 @@ EQ設定ファイルは以下の2種類が出力されます。
 - tkinter: 
 - ttkthemes: 
 - numpy: 
-- gnuplot:
+- matplotlib:
 
 インストールには以下のバッチファイル/シェルをご利用下さい。
 - Windows: install_win.bat

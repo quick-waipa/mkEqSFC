@@ -13,6 +13,8 @@ https://note.com/waipa/n/ncecf0fcbd168
    - Changed so that EQ is calculated after creating a filtered target curve.
 - Ver.1.03 2024/04/18
    - Fixed to be able to read regular csv files.
+- Ver.1.04 2024/04/18
+   - Changed graph drawing to matplotlib.
 - Test Environment: 
    - Windows 10 22H2 (Python 3.11.5)
    - Ubuntu 22.04.3 LTS (Python 3.10.12)
@@ -84,7 +86,7 @@ Please install the following libraries.
 - tkinter: 
 - ttkthemes: 
 - numpy: 
-- gnuplot:
+- matplotlib:
 
 Please use the following batch file/shell script for installation:
 - Windows: install_win.bat
