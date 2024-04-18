@@ -6,6 +6,7 @@ import os
 import subprocess
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from datetime import datetime
 from pathlib import Path
 from scipy.optimize import curve_fit
@@ -249,49 +250,31 @@ def plot_data_and_curve(freqs, gains0, gains, eq_curve, t_curve, out, output_fol
     eqd_data = np.column_stack((freqs, gains))
     eq_curve = np.column_stack((freqs, eq_curve))
     t_curve = np.column_stack((freqs, t_curve))
-    
-    df = pd.DataFrame(data, columns=['Frequency', 'Gain'])
-    df_eqd = pd.DataFrame(eqd_data, columns=['Frequency', 'Gain'])
-    df_eq_curve = pd.DataFrame(eq_curve, columns=['Frequency', 'Gain'])
-    df_t_curve = pd.DataFrame(t_curve, columns=['Frequency', 'Gain'])
-    
-    df.to_csv('data.csv', index=False)
-    df_eqd.to_csv('eqd_data.csv', index=False)
-    df_eq_curve.to_csv('eq_curve.csv', index=False)
-    df_t_curve.to_csv('t_curve.csv', index=False)
-    
-    with open('gnuplot_script.plt', 'w') as f:
-        f.write("""
-set terminal pngcairo enhanced
-set xlabel 'Frequency (Hz)'
-set ylabel 'Gain (dB)'
-set title 'Equalization Curve'
-set xrange [20:20000]
-set yrange [-20:20]
-set grid 
-set size ratio 0.7
-set style line 1 linecolor rgb "red"
-set style line 2 linecolor rgb "green"
-set style line 3 linecolor rgb "blue"
-set style line 4 linecolor rgb "purple"
-set style increment user
-set logscale x
-set output "equalization_data_plot.png"
-set datafile separator ','
-set tmargin 5
-plot 'data.csv' using 1:2 skip 1 with lines title 'Frequency Respons', \
-     'eqd_data.csv' using 1:2 with lines title 'EQd Frequency Respons', \
-     'eq_curve.csv' using 1:2 with lines title 'EQ Curve' , \
-     't_curve.csv' using 1:2 with lines title 'Target Curve' 
-""")
-    
-    subprocess.run(['gnuplot', 'gnuplot_script.plt'])
 
-    os.remove('data.csv')
-    os.remove('eqd_data.csv')
-    os.remove('eq_curve.csv')
-    os.remove('t_curve.csv')
-    os.remove('gnuplot_script.plt')
+    # プロット設定
+    plt.figure(figsize=(8, 6))
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Gain (dB)')
+    plt.title('Equalization Curve')
+    plt.xscale('log')
+    plt.grid(True)
+    plt.xlim(20, 20000)
+    plt.ylim(-20, 20)
+
+    # データのプロット
+    plt.plot(data[:, 0], data[:, 1], label='Frequency Respons', color='lightblue', linewidth=2)
+    plt.plot(eqd_data[:, 0], eqd_data[:, 1], label='EQd Frequency Respons', color='steelblue', linewidth=2)
+    plt.plot(eq_curve[:, 0], eq_curve[:, 1], label='EQ Curve', color='deeppink', linewidth=1)
+    plt.plot(t_curve[:, 0], t_curve[:, 1], '--', label='Target Curve', color='tomato')
+
+    # 凡例の表示
+    plt.legend()
+
+    # グラフの保存
+    plt.savefig('equalization_data_plot.png')
+
+    # グラフの表示
+    plt.close()
     
     os.rename("equalization_data_plot.png" ,out + "equalization_data_plot.png" )
     

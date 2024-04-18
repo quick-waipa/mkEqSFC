@@ -7,6 +7,7 @@ import shutil
 import numpy as np
 import re
 import subprocess
+import matplotlib.pyplot as plt
 import cmath
 from pathlib import Path
 from scipy.integrate import simps
@@ -176,38 +177,31 @@ def apply_filter(filter_curve, msp3_curve):
 # Plot the curves---------------------------------------------------------------
 def plot_eq_curve(data, output_folder):
     
-    np.savetxt("data.txt", data, fmt='%.6f')
-    
-    with open('plot_commands.gp', 'w') as f:
-        f.write('''
-set terminal pngcairo enhanced
-set output 'filtered_FR_data_plot.png'
-set xlabel 'Frequency (Hz)'
-set ylabel 'Gain (dB)'
-set title 'Filtered Frequency Respons Data'
-set xrange [20:20000]
-set yrange [-20:20]
-set grid 
-set size ratio 0.7
-set logscale x
-set style line 1 linecolor rgb "light-salmon"
-set style line 2 linecolor rgb "green"
-set style line 3 linecolor rgb "skyblue"
-set style line 4 linecolor rgb "blue"
-set style line 5 linecolor rgb "red"
-set style increment user
-set tmargin 5
-plot 'data.txt' using 1:2 with lines title 'Org FR', \
-     'data.txt' using 1:3 with lines title 'Slope' , \
-     'data.txt' using 1:4 with lines title 'Filter' , \
-     'data.txt' using 1:5 with lines title 'Filter - Slope', \
-     'data.txt' using 1:6 with lines title 'Filtered FR'
-''')
+    # プロット設定
+    plt.figure(figsize=(8, 6))
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Gain (dB)')
+    plt.title('Filtered Frequency Response Data')
+    plt.xscale('log')
+    plt.grid(True)
+    plt.xlim(20, 20000)
+    plt.ylim(-20, 20)
 
-    subprocess.run(['gnuplot', 'plot_commands.gp'])
-    
-    os.remove('data.txt')
-    os.remove('plot_commands.gp')
+    # データのプロット
+    plt.plot(data[:, 0], data[:, 1], label='Org FR', color='pink')
+    plt.plot(data[:, 0], data[:, 2], label='Slope', color='limegreen')
+    plt.plot(data[:, 0], data[:, 3], label='Filter', color='lightblue')
+    plt.plot(data[:, 0], data[:, 4], label='Filter - Slope', color='steelblue')
+    plt.plot(data[:, 0], data[:, 5], label='Filtered FR', color='tomato')
+
+    # 凡例の表示
+    plt.legend()
+
+    # グラフの保存
+    plt.savefig('filtered_FR_data_plot.png')
+
+    # グラフの表示
+    plt.close()
     
     # ファイルを移動し、上書きする
     os.replace("filtered_FR_data_plot.png", output_folder.joinpath("filtered_FR_data_plot.png"))
