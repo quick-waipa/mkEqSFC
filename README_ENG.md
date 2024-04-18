@@ -15,6 +15,7 @@ https://note.com/waipa/n/ncecf0fcbd168
    - Fixed to be able to read regular csv files.
 - Ver.1.04 2024/04/18
    - Changed graph drawing to matplotlib.
+
 - Test Environment: 
    - Windows 10 22H2 (Python 3.11.5)
    - Ubuntu 22.04.3 LTS (Python 3.10.12)
@@ -92,8 +93,15 @@ Please use the following batch file/shell script for installation:
 - Windows: install_win.bat
 - Linux: install_linux.sh
 
-The execution commands are as follows.  
-`python mkEqSFC.py`
+***
+## Running the program:
+The command to run the program is.  
+    
+`python mkEqSFC.py`  
+
+You can also create an executable file with  
+- Windows: build.bat  
+- Linux: `sh build.sh`  
 
 Note: Please place `config.yaml` in the same folder as the executable file.  
 Note: If you plan to execute the program on Linux, it might be advisable to replace the Japanese fonts in the `create_gui()` function of `mkEqSFC.py.`

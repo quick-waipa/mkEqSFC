@@ -15,6 +15,7 @@ https://note.com/waipa/n/ncecf0fcbd168
    - 普通のcsvファイルが読めるように修正。
 - Ver.1.04 2024/04/18
    - グラフの描画をmatplotlibに変更。
+   
 - テスト環境: 
    - Windows 10 22H2 (Python 3.11.5)
    - Ubuntu 22.04.3 LTS (Python 3.10.12)
@@ -85,19 +86,26 @@ EQ設定ファイルは以下の2種類が出力されます。
 ## インストールが必要なライブラリ：
 以下のライブラリをインストールしてください。
 
-- pandas: 
-- yaml: 
-- tkinter: 
-- ttkthemes: 
-- numpy: 
-- matplotlib:
+- pandas 
+- yaml 
+- tkinter 
+- ttkthemes 
+- numpy 
+- matplotlib
 
 インストールには以下のバッチファイル/シェルをご利用下さい。
 - Windows: install_win.bat
 - Linux: install_linux.sh
 
-実行コマンドは以下です。  
-`python mkEqSFC.py`
+***
+## プログラムの実行：
+プログラムの実行コマンドは以下です。  
+    
+`python mkEqSFC.py`  
+
+また以下で実行ファイルを作成できます。  
+- Windows: build.bat  
+- Linux: `sh build.sh`  
 
 注：`config.yaml`は実行ファイルと同じフォルダに入れてください。  
 注：Linuxで実行する場合、`mkEqSFC.py` の `create_gui()` 関数内の日本語フォントを書き換えた方がいいかもしれません。
