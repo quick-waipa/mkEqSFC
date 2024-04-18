@@ -82,12 +82,12 @@ When mixing, please refer to the RMS value in the rms.txt file to adjust the gai
 ## Libraries that need to be installed:
 Please install the following libraries.
 
-- pandas: 
-- yaml: 
-- tkinter: 
-- ttkthemes: 
-- numpy: 
-- matplotlib:
+- pandas 
+- yaml 
+- tkinter 
+- ttkthemes 
+- numpy 
+- matplotlib
 
 Please use the following batch file/shell script for installation:
 - Windows: install_win.bat
