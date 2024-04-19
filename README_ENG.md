@@ -15,7 +15,8 @@ https://note.com/waipa/n/ncecf0fcbd168
    - Fixed to be able to read regular csv files.
 - Ver.1.04 2024/04/18
    - Changed graph drawing to matplotlib.
-
+- Ver.1.05 2024/04/19
+   - Modified to automatically normalize frequency response data with a gain of 1000 Hz
 - Test Environment: 
    - Windows 10 22H2 (Python 3.11.5)
    - Ubuntu 22.04.3 LTS (Python 3.10.12)
@@ -55,7 +56,7 @@ When mixing, please refer to the RMS value in the rms.txt file to adjust the gai
  + **Output Folder Path:** Please input the path to the folder where output files will be stored.
  
 #### [Input Data]
- + **Speaker FR Data File Path:** Data Format: Hz, Gain (comma-separated). Please input the file path of the speaker's frequency response data. Any relative gain level is fine for the calculation, but because of the plot drawing range, it is better to adjust the gain level to be near 0 dB. Note that an error will occur if there is no data between 20Hz and 20,000Hz.
+ + **Speaker FR Data File Path:** Data Format: Hz, Gain (comma-separated). Please input the file path of the speaker's frequency response data. Note that an error will occur if there is no data between 20Hz and 20,000Hz.
  + **Filter Data File Path: Data Format:** Hz, Gain (comma-separated). Please input the file path of the characteristic filter (e.g., ISO 226:2023 75phon data can be utilized from ISO_226_2023_75phon.txt).
  + **EQ Target Curve File Path: Data Format:** Hz, Gain (comma-separated). Please input the file path of the curve that serves as the target when creating EQ. It's suggested to use a flat curve rather than adding any tilt (target_curve_Flat.txt).
  
