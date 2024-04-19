@@ -17,6 +17,8 @@ https://note.com/waipa/n/ncecf0fcbd168
    - Changed graph drawing to matplotlib.
 - Ver.1.05 2024/04/19
    - Modified to automatically normalize frequency response data with a gain of 1000 Hz
+- Ver.1.06 2024/04/19
+   - A parameter can be used to specify how much to fill the dip.
 - Test Environment: 
    - Windows 10 22H2 (Python 3.11.5)
    - Ubuntu 22.04.3 LTS (Python 3.10.12)
@@ -78,6 +80,7 @@ When mixing, please refer to the RMS value in the rms.txt file to adjust the gai
  + **High Cutoff(Filtered FR) [Hz]:** Set the upper frequency limit of the frequency response data used when creating EQ (filtered frequency response version).
  + **Window Octave [oct]:** When creating EQ, this sets the frequency width to sample when fitting the frequency response data with a Gaussian function. Setting it around 0.1 octaves is recommended.
  + **EQ Creating Target Level [dB]:** Set the target level when creating EQ.
+ + **How Much to Fill the Dip:** You can specify how much to fill the dip (0.0 to 1.0).
  
 ***
 ## Libraries that need to be installed:
