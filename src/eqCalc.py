@@ -186,6 +186,9 @@ def plot_eq_curve(data, output_folder):
     plt.grid(True)
     plt.xlim(20, 20000)
     plt.ylim(-20, 20)
+    plt.minorticks_on()
+    plt.grid(which="major", color="black", alpha=0.5)
+    plt.grid(which="minor", color="gray", alpha=0.1)
 
     # データのプロット
     plt.plot(data[:, 0], data[:, 1], label='Org FR', color='pink')
@@ -283,4 +286,4 @@ def specCalc(file2_path, file3_path, output_folder, slope):
     data = np.column_stack((f_range, msp3_curve, slope_curve, k_filter_curve, k_filter_curve2, target_curve, target_curve_eqLoudness_std))
     #np.savetxt(out_path, data[:,[0,5]], delimiter=',', fmt='%.6f')
     np.savetxt(output_folder.resolve().joinpath("target_curve_eqLoudness.txt"), data[:,[0,6]], delimiter=',', fmt='%.6f')
-    plot_eq_curve(data, output_folder)
+    #plot_eq_curve(data, output_folder)

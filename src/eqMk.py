@@ -38,6 +38,26 @@ def remove_duplicates(df):
     df_no_duplicates = df.drop_duplicates()
     return df_no_duplicates
 
+def linear_interpolation(freq, gain, target_freq):
+    # freqの中でtarget_freqに最も近い2つの周波数を見つける
+    idx = 0
+    while idx < len(freq) - 1 and freq[idx + 1] < target_freq:
+        idx += 1
+    
+    # 線形補間
+    if idx == len(freq) - 1:  # 最後の要素の場合
+        interpolated_gain = gain[idx]
+    else:
+        # 2つの周波数と対応するgainを取得
+        freq_lower, freq_upper = freq[idx], freq[idx + 1]
+        gain_lower, gain_upper = gain[idx], gain[idx + 1]
+        
+        # 線形補間
+        interpolated_gain = gain_lower + (gain_upper - gain_lower) * ((target_freq - freq_lower) / (freq_upper - freq_lower))
+    
+    return interpolated_gain
+
+
 def gaussian_function(x, a, b, c):
     """
     Gaussian function for modeling peaks.
@@ -260,12 +280,15 @@ def plot_data_and_curve(freqs, gains0, gains, eq_curve, t_curve, out, output_fol
     plt.grid(True)
     plt.xlim(20, 20000)
     plt.ylim(-20, 20)
+    plt.minorticks_on()
+    plt.grid(which="major", color="black", alpha=0.5)
+    plt.grid(which="minor", color="gray", alpha=0.1)
 
     # データのプロット
-    plt.plot(data[:, 0], data[:, 1], label='Frequency Respons', color='lightblue', linewidth=2)
-    plt.plot(eqd_data[:, 0], eqd_data[:, 1], label='EQd Frequency Respons', color='steelblue', linewidth=2)
-    plt.plot(eq_curve[:, 0], eq_curve[:, 1], label='EQ Curve', color='deeppink', linewidth=1)
     plt.plot(t_curve[:, 0], t_curve[:, 1], '--', label='Target Curve', color='tomato')
+    plt.plot(data[:, 0], data[:, 1], label='Frequency Respons', color='lightblue', linewidth=2)
+    plt.plot(eq_curve[:, 0], eq_curve[:, 1], label='EQ Curve', color='deeppink', linewidth=1)
+    plt.plot(eqd_data[:, 0], eqd_data[:, 1], label='EQd Frequency Respons', color='steelblue', linewidth=2)
 
     # 凡例の表示
     plt.legend()
@@ -338,8 +361,12 @@ def eqMk(data):
     # Remove duplicates
     df_no_duplicates = remove_duplicates(df)
     
-    
     df_curve = df_no_duplicates
+    
+    #1000Hzのgainで規格化
+    gain_tmp = linear_interpolation(df_curve['freq'].to_numpy(), df_curve['gain'].to_numpy(), 1000)
+    df_curve['gain'] -= gain_tmp
+    
     freqs  = df_curve['freq']
     gains0 = df_curve['gain']
     gains  = df_curve['gain']

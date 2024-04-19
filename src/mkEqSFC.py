@@ -15,7 +15,7 @@ from pathlib import Path
 import eqCalc
 import eqMk
 
-Ver = "1.04"
+Ver = "1.05"
 
 # ウィンドウを閉じた際にPythonを終了する
 def close_window():
@@ -111,7 +111,7 @@ def open_folder_dialog(entry_widget):
 def create_gui():
     global root
     root = ThemedTk(theme='adapta')
-    root.title("mkEqSFC")
+    root.title("mkEqSFC Ver." + str(Ver))
     root.protocol("WM_DELETE_WINDOW", close_window)
     load_yaml()
     
