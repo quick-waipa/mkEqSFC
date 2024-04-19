@@ -11,6 +11,7 @@ from datetime import datetime
 from pathlib import Path
 from scipy.optimize import curve_fit
 from scipy.interpolate import interp1d
+from scipy.signal import find_peaks
 
 def load_data(file_path):
     """
@@ -104,6 +105,59 @@ def interpolate_gain(df, target_freq):
     interpolated_gain = np.interp(target_freq, nearest_freqs, nearest_gains)
     return interpolated_gain
 
+def find_dips(df, low_cutoff, high_cutoff):
+    filtered_df = df[(df['freq'] >= low_cutoff) & (df['freq'] <= high_cutoff)]
+    
+    freqs = filtered_df['freq'].to_numpy()
+    gains = filtered_df['gain'].to_numpy()
+    gains_inverted = -gains
+    
+    # 移動平均を求める
+    window_size = int(len(freqs)/3)
+    smoothed_gains = np.convolve(gains_inverted, np.ones(window_size)/window_size, mode='same')
+
+    # 周波数特性から移動平均を差し引く
+    adjusted_gains = gains_inverted[:len(smoothed_gains)] - smoothed_gains
+    
+    std_gains = adjusted_gains / adjusted_gains.max()
+    
+    peaks, _ = find_peaks(std_gains, height=0.3)
+    
+    # ピーク同士の間隔を計算し、近接するピークを除外する
+    min_peak_distance = 0.5  # ピーク同士の最小間隔 [oct]
+    filtered_peaks = [peaks[0]]  # 最初のピークは必ず残す
+    for i in range(1, len(peaks)):
+        if np.log2(freqs[peaks[i]]) - np.log2(freqs[peaks[i-1]]) >= min_peak_distance:
+            filtered_peaks.append(peaks[i])
+        if gains[peaks[i]] < gains[peaks[i-1]]:
+            filtered_peaks.pop(len(filtered_peaks) - 1)
+            filtered_peaks.append(peaks[i])
+    
+    dip_gains = gains[filtered_peaks]
+    dips = freqs[filtered_peaks]
+    #dip_gains = dip_gains / dip_gains.max()
+    print("dips[Hz]: ",dips)
+    
+    q_values = []
+    
+    for i in range(len(dips)):
+        q_value = estimate_q_value(filtered_df, dips[i], dip_gains[i], 0.1, 8, 1, 4)
+        q_values.append(q_value + 2)    
+    
+    # プロット
+    #plt.plot(freqs, adjusted_gains)
+    #plt.plot(freqs, gains_inverted, label='Original Gain')
+    #plt.plot(freqs, smoothed_gains, label='Smoothed Gain (4th-order)')
+    #plt.xlabel('Frequency')
+    #plt.ylabel('Gain')
+    #plt.title('Smoothed Frequency Response')
+    #plt.xscale('log')
+    #plt.legend()
+    #plt.show()
+    
+    return dips, dip_gains, q_values
+
+
 def find_peak_and_dip(df, df_t):
     """
     Find the peak and dip from the data.
@@ -133,13 +187,13 @@ def find_peak_and_dip(df, df_t):
     #tg_min = df_t.loc[df_t['freq'] == min_g_freq, 'gain'].values[0]
     
     
-    if abs(max_g) > abs(min_g):
+    if abs(max_g) > abs(min_g): #ピークがターゲットの場合
         # Peak is further from the target gain
         return max_g_freq, df.loc[df['freq'] == max_g_freq, 'gain'].values[0]
-    else:
+    else: #ディップがターゲットの場合
         # Dip is further from the target gain
         return min_g_freq, df.loc[df['freq'] == min_g_freq, 'gain'].values[0]
-
+    
 def estimate_neighbor_freq(df_filtered, freq, gain, window_oct):
     """
     Estimate the neighbor frequency using Gaussian peak modeling.
@@ -351,6 +405,8 @@ def eqMk(data):
     output_folder = data['output_folder']
     
     target_on = data['target_on']
+    
+    dip_alpha = data['dip_alpha']
 
     #=======================================================================
     
@@ -365,11 +421,14 @@ def eqMk(data):
     
     #1000Hzのgainで規格化
     gain_tmp = linear_interpolation(df_curve['freq'].to_numpy(), df_curve['gain'].to_numpy(), 1000)
-    df_curve['gain'] -= gain_tmp
+    df_curve.loc[:, 'gain'] -= gain_tmp
+    
     
     freqs  = df_curve['freq']
     gains0 = df_curve['gain']
     gains  = df_curve['gain']
+    
+    dip_freqs, dip_gains, dip_qs = find_dips(df_curve, low_cutoff, high_cutoff)
     
     interpolator = interp1d(np.log10(df_t['freq']), df_t['gain'], kind='linear', fill_value="extrapolate")
     t_curve = interpolator(np.log10(freqs))
@@ -377,7 +436,14 @@ def eqMk(data):
         t_curve = t_curve + target
     else:
         t_curve = np.zeros_like(freqs) + target
-    df_t_curve = pd.DataFrame({'freq':freqs, 'gain':t_curve})
+        
+    for dip_freq in dip_freqs:
+        dip_gains[dip_freqs == dip_freq] -= t_curve[freqs == dip_freq]
+    
+    eq_dips = mk_eq(dip_freqs, dip_gains, dip_qs, freqs)*(1 - dip_alpha)
+    t_curve_dips = apply_eq(t_curve, eq_dips)
+    
+    df_t_curve = pd.DataFrame({'freq':freqs, 'gain':t_curve_dips})
     
     q_values = []
     f0s = []
@@ -403,7 +469,6 @@ def eqMk(data):
         
         print(f"Target frequency: {target_freq} Hz")
         print(f"Target gain: {target_gain} dB")
-    
         # Estimate the Q value
         q_value = estimate_q_value(df_curve, target_freq, target_gain, window_oct, max_q, min_q, default_q)
         
@@ -411,6 +476,7 @@ def eqMk(data):
         
         q_values.append(q_value)
         f0s.append(target_freq)
+        
         eq_gains.append(-target_gain + df_t_curve.loc[df_t_curve['freq'] == target_freq, 'gain'].values[0])
 
         # make equalizer
@@ -423,11 +489,11 @@ def eqMk(data):
         
         print("---------------------------------------")
     
-    gains = df_curve['gain']
-    
     # write eq settings
     write_eq_settings(f0s, eq_gains, q_values, out_path, model_str)
     
+    gains = df_curve['gain']
+    
     # Plot data and fitting curve
-    plot_data_and_curve(freqs, gains0, gains, eq_curve, t_curve ,out, output_folder)
+    plot_data_and_curve(freqs, gains0, gains, eq_curve, t_curve_dips ,out, output_folder)
     

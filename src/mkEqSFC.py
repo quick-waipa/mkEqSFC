@@ -15,7 +15,7 @@ from pathlib import Path
 import eqCalc
 import eqMk
 
-Ver = "1.05"
+Ver = "1.06"
 
 # ウィンドウを閉じた際にPythonを終了する
 def close_window():
@@ -52,6 +52,7 @@ def load_yaml():
         'high_cutoff2',
         'window_oct',
         'target',
+        'dip_alpha',
     ]
     
     # data_config のキーの順序を取得し、それを parameter_order として使用
@@ -122,7 +123,7 @@ def create_gui():
     font_jp = ("Meiryo", 10)
     
     # ウィンドウのサイズ
-    root.geometry("990x920")
+    root.geometry("990x950")
     
     #テーマ
     #s = ttk.Style()
@@ -143,7 +144,7 @@ def create_gui():
     ttk.Label(parent, text=' [Output File Name] -----------------------------------------------------------------------------------------------------------------------', font=font_b).grid(row=6, column=0, columnspan=3, sticky="w", pady=5, padx=0)
     ttk.Label(parent, text=' [Application of Characteristic Filter to Frequency Respons] ------------------------------------------------------------------------------', font=font_b).grid(row=9, column=0, columnspan=3, sticky="w", pady=5, padx=0)
     ttk.Label(parent, text=' [Make EQ Curves] -------------------------------------------------------------------------------------------------------------------------', font=font_b).grid(row=11, column=0, columnspan=3, sticky="w", pady=5, padx=0)
-    ttk.Label(parent, text=' ', font=font_b).grid(row=22, column=0, columnspan=3, sticky="w", pady=0, padx=0)
+    ttk.Label(parent, text=' ', font=font_b).grid(row=23, column=0, columnspan=3, sticky="w", pady=0, padx=0)
     
     entry_frames = []
     
@@ -247,6 +248,8 @@ def calculate():
 
     target = float(config['target']) #EQ生成のときのターゲットゲインレベル [dB]
     target_file = Path(config['target_file'])
+    
+    dip_alpha = float(config['dip_alpha']) #ディップをどれだけ埋めるかのパラメータ(0.0～1.0)
 
     
     # スクリプトファイルのディレクトリを取得
@@ -293,6 +296,7 @@ def calculate():
             'out':'',
             'output_folder':output_folder,
             'target_on':True,
+            'dip_alpha':dip_alpha,
     }
     eqMk.eqMk(data)
     
@@ -315,6 +319,7 @@ def calculate():
             'out':'f_',
             'output_folder':output_folder,
             'target_on':True,
+            'dip_alpha':dip_alpha,
     }
     eqMk.eqMk(data2)
     
@@ -392,6 +397,7 @@ def main():
         'high_cutoff2': ' High Cutoff (Filtered FR) [Hz]',
         'target': ' EQ Creating Target Level [dB]',
         'target_file': ' EQ Target Curve File Path',
+        'dip_alpha':' How Much to Fill the Dip',
     }
 
     # 各パラメータに対応するコメント文
@@ -414,6 +420,7 @@ def main():
         'high_cutoff2': 'EQ（特性フィルター適用Ver.）作成時の周波数カットオフ上限値',
         'target': 'EQ作成時のターゲットレベル',
         'target_file': '',
+        'dip_alpha':'ディップをどれだけ埋めるか(0.0～1.0)',
     }
     
     # ファイルパスを選択できるデータのキー
