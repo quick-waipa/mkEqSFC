@@ -92,6 +92,7 @@ EQ設定ファイルは以下の2種類が出力されます。
 - tkinter 
 - ttkthemes 
 - numpy 
+- scipy  
 - matplotlib
 
 インストールには以下のバッチファイル/シェルをご利用下さい。

@@ -88,6 +88,7 @@ Please install the following libraries.
 - tkinter 
 - ttkthemes 
 - numpy 
+- scipy  
 - matplotlib
 
 Please use the following batch file/shell script for installation:
