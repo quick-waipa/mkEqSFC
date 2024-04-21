@@ -407,6 +407,8 @@ def eqMk(data):
     target_on = data['target_on']
     
     dip_alpha = data['dip_alpha']
+    
+    hrtf_path = data['hrtf_path']
 
     #=======================================================================
     
@@ -423,7 +425,6 @@ def eqMk(data):
     gain_tmp = linear_interpolation(df_curve['freq'].to_numpy(), df_curve['gain'].to_numpy(), 1000)
     df_curve.loc[:, 'gain'] -= gain_tmp
     
-    
     freqs  = df_curve['freq']
     gains0 = df_curve['gain']
     gains  = df_curve['gain']
@@ -436,6 +437,14 @@ def eqMk(data):
         t_curve = t_curve + target
     else:
         t_curve = np.zeros_like(freqs) + target
+        
+    if os.path.isfile(hrtf_path):
+        df_hrtf = load_data(hrtf_path)
+        interpolator = interp1d(np.log10(df_hrtf['freq']), df_hrtf['gain'], kind='linear', fill_value="extrapolate")
+        hrtf_curve = interpolator(np.log10(freqs))
+        t_curve = t_curve + hrtf_curve
+    else:
+        t_curve = t_curve
         
     for dip_freq in dip_freqs:
         dip_gains[dip_freqs == dip_freq] -= t_curve[freqs == dip_freq]
