@@ -19,6 +19,8 @@ https://note.com/waipa/n/ncecf0fcbd168
    - Modified to automatically normalize frequency response data with a gain of 1000 Hz
 - Ver.1.06 2024/04/19
    - A parameter can be used to specify how much to fill the dip.
+- Ver.1.07 2024/04/21
+   - Compatible with headphone correction
 - Test Environment: 
    - Windows 10 22H2 (Python 3.11.5)
    - Ubuntu 22.04.3 LTS (Python 3.10.12)
@@ -61,7 +63,8 @@ When mixing, please refer to the RMS value in the rms.txt file to adjust the gai
  + **Speaker FR Data File Path:** Data Format: Hz, Gain (comma-separated). Please input the file path of the speaker's frequency response data. Note that an error will occur if there is no data between 20Hz and 20,000Hz.
  + **Filter Data File Path: Data Format:** Hz, Gain (comma-separated). Please input the file path of the characteristic filter (e.g., ISO 226:2023 75phon data can be utilized from ISO_226_2023_75phon.txt).
  + **EQ Target Curve File Path: Data Format:** Hz, Gain (comma-separated). Please input the file path of the curve that serves as the target when creating EQ. It's suggested to use a flat curve rather than adding any tilt (target_curve_Flat.txt).
- 
+ + **HRTF - ECTF File Path: Data Format:** Hz, Gain (comma-separated). Please enter this only when calibrating the headphones. Please enter the file path of the head-related transfer function (HRTF) minus the ear canal transfer function (ECTF) (that is, the characteristic data measured at the entrance of the ear canal).
+  
 #### [Output File Name]
  + **EQ(Normal FR)File Name:** Input the file name for the EQ data (normal frequency response).
  + **EQ(Filtered FR)File Name:** Input the file name for the EQ data (frequency response after filtering).
