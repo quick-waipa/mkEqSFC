@@ -21,6 +21,8 @@ https://note.com/waipa/n/ncecf0fcbd168
    - A parameter can be used to specify how much to fill the dip.
 - Ver.1.07 2024/04/21
    - Compatible with headphone correction
+- Ver.1.08 2024/04/22
+   - Modified to calculate the ear canal transfer function in the code.
 - Test Environment: 
    - Windows 10 22H2 (Python 3.11.5)
    - Ubuntu 22.04.3 LTS (Python 3.10.12)
@@ -55,37 +57,6 @@ For example, Equalizer APO can split the input audio into two, apply different E
 When mixing, please refer to the RMS value in the rms.txt file to adjust the gain.
 
 ***
-## Input Data:
-#### [Output Folder]
- + **Output Folder Path:** Please input the path to the folder where output files will be stored.
- 
-#### [Input Data]
- + **Speaker FR Data File Path:** Data Format: Hz, Gain (comma-separated). Please input the file path of the speaker's frequency response data. Note that an error will occur if there is no data between 20Hz and 20,000Hz.
- + **Filter Data File Path: Data Format:** Hz, Gain (comma-separated). Please input the file path of the characteristic filter (e.g., ISO 226:2023 75phon data can be utilized from ISO_226_2023_75phon.txt).
- + **EQ Target Curve File Path: Data Format:** Hz, Gain (comma-separated). Please input the file path of the curve that serves as the target when creating EQ. It's suggested to use a flat curve rather than adding any tilt (target_curve_Flat.txt).
- + **HRTF - ECTF File Path: Data Format:** Hz, Gain (comma-separated). Please enter this only when calibrating the headphones. Please enter the file path of the head-related transfer function (HRTF) minus the ear canal transfer function (ECTF) (that is, the characteristic data measured at the entrance of the ear canal).
-  
-#### [Output File Name]
- + **EQ(Normal FR)File Name:** Input the file name for the EQ data (normal frequency response).
- + **EQ(Filtered FR)File Name:** Input the file name for the EQ data (frequency response after filtering).
- 
-#### [Application of Characteristic Filter to Frequency Response]
- + **Slope [dB/oct]:** Adjust this value based on how much slope your typical music has. Setting it to the value of pink noise is recommended (-3 dB/oct).
- 
-#### [Make EQ Curve]
- + **Band Number:** Input the number of bands for the EQ to create.
- + **Max Q [-]:** Set the maximum value for Q.
- + **Min Q [-]:** Set the minimum value for Q.
- + **Default Q [-]:** This is the Q value to set in case of calculation errors. Setting it around 4 is recommended.
- + **Low Cutoff(Normal FR) [Hz]:** Set the lower frequency limit of the frequency response data used when creating EQ (normal frequency response version).
- + **High Cutoff(Normal FR) [Hz]:** Set the upper frequency limit of the frequency response data used when creating EQ (normal frequency response version).
- + **Low Cutoff(Filtered FR) [Hz]:** Set the lower frequency limit of the frequency response data used when creating EQ (filtered frequency response version).
- + **High Cutoff(Filtered FR) [Hz]:** Set the upper frequency limit of the frequency response data used when creating EQ (filtered frequency response version).
- + **Window Octave [oct]:** When creating EQ, this sets the frequency width to sample when fitting the frequency response data with a Gaussian function. Setting it around 0.1 octaves is recommended.
- + **EQ Creating Target Level [dB]:** Set the target level when creating EQ.
- + **How Much to Fill the Dip:** You can specify how much to fill the dip (0.0 to 1.0).
- 
-***
 ## Libraries that need to be installed:
 Please install the following libraries.
 
@@ -113,7 +84,38 @@ You can also create an executable file with
 
 Note: Please place `config.yaml` in the same folder as the executable file.  
 Note: If you plan to execute the program on Linux, it might be advisable to replace the Japanese fonts in the `create_gui()` function of `mkEqSFC.py.`
+***
 
+## Input Data:
+#### [Output Folder]
+ + **Output Folder Path:** Please input the path to the folder where output files will be stored.
+ 
+#### [Input Data]
+ + **Speaker FR Data File Path:** Data Format: Hz, Gain (comma-separated). Please input the file path of the speaker's frequency response data. Note that an error will occur if there is no data between 20Hz and 20,000Hz.
+ + **Filter Data File Path: Data Format:** Hz, Gain (comma-separated). Please input the file path of the characteristic filter (e.g., ISO 226:2023 75phon data can be utilized from ISO_226_2023_75phon.txt).
+ + **EQ Target Curve File Path: Data Format:** Hz, Gain (comma-separated). Please input the file path of the curve that serves as the target when creating EQ. It's suggested to use a flat curve rather than adding any tilt (target_curve_Flat.txt).
+ + **HRTF - ECTF File Path: Data Format:** Hz, Gain (comma-separated). Enter only if you are correcting for headphones. Enter the file path of the head transfer function (HRTF). Diffuse Field Curve measured at the eardrum (ISO11904_1_DF_ED.csv).
+  
+#### [Output File Name]
+ + **EQ(Normal FR)File Name:** Input the file name for the EQ data (normal frequency response).
+ + **EQ(Filtered FR)File Name:** Input the file name for the EQ data (frequency response after filtering).
+ 
+#### [Application of Characteristic Filter to Frequency Response]
+ + **Slope [dB/oct]:** Adjust this value based on how much slope your typical music has. Setting it to the value of pink noise is recommended (-3 dB/oct).
+ 
+#### [Make EQ Curve]
+ + **Band Number:** Input the number of bands for the EQ to create.
+ + **Max Q [-]:** Set the maximum value for Q.
+ + **Min Q [-]:** Set the minimum value for Q.
+ + **Default Q [-]:** This is the Q value to set in case of calculation errors. Setting it around 4 is recommended.
+ + **Low Cutoff(Normal FR) [Hz]:** Set the lower frequency limit of the frequency response data used when creating EQ (normal frequency response version).
+ + **High Cutoff(Normal FR) [Hz]:** Set the upper frequency limit of the frequency response data used when creating EQ (normal frequency response version).
+ + **Low Cutoff(Filtered FR) [Hz]:** Set the lower frequency limit of the frequency response data used when creating EQ (filtered frequency response version).
+ + **High Cutoff(Filtered FR) [Hz]:** Set the upper frequency limit of the frequency response data used when creating EQ (filtered frequency response version).
+ + **Window Octave [oct]:** When creating EQ, this sets the frequency width to sample when fitting the frequency response data with a Gaussian function. Setting it around 0.1 octaves is recommended.
+ + **EQ Creating Target Level [dB]:** Set the target level when creating EQ.
+ + **How Much to Fill the Dip:** You can specify how much to fill the dip (0.0 to 1.0).
+ 
 ***
 ## Author
 - Quick-Waqipa
