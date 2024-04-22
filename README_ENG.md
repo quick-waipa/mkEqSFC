@@ -93,7 +93,7 @@ Note: If you plan to execute the program on Linux, it might be advisable to repl
 #### [Input Data]
  + **Speaker FR Data File Path:** Data Format: Hz, Gain (comma-separated). Please input the file path of the speaker's frequency response data. Note that an error will occur if there is no data between 20Hz and 20,000Hz.
  + **Filter Data File Path: Data Format:** Hz, Gain (comma-separated). Please input the file path of the characteristic filter (e.g., ISO 226:2023 75phon data can be utilized from ISO_226_2023_75phon.txt).
- + **EQ Target Curve File Path: Data Format:** Hz, Gain (comma-separated). Please input the file path of the curve that serves as the target when creating EQ. It's suggested to use a flat curve rather than adding any tilt (target_curve_Flat.txt).
+ + **EQ Target Curve File Path: Data Format:** Hz, Gain (comma-separated). Please input the file path of the curve that serves as the target when creating EQ. It's suggested to use a flat curve rather than adding any tilt (target_curve_Flat.txt). However, in the case of headphone correction, it is necessary to consider the head transfer function, so it is better to set an appropriate target curve (e.g., Harman curve).
  + **HRTF - ECTF File Path: Data Format:** Hz, Gain (comma-separated). Enter only if you are correcting for headphones. Enter the file path of the head transfer function (HRTF). Diffuse Field Curve measured at the eardrum (ISO11904_1_DF_ED.csv).
   
 #### [Output File Name]
