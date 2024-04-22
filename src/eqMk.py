@@ -237,6 +237,9 @@ def estimate_neighbor_freq(df_filtered, freq, gain, window_oct):
         #else:
         #    print("---Complete Voigt fitting---")
         #    amplitude, center_freq, std_dev = params
+    except TypeError as e:
+        print("---Gaussian Curve fitting Error---")
+        amplitude = gain
     else:
         print("---Complete Gaussian fitting---")
         # Get the parameters of the Gaussian function
@@ -408,7 +411,7 @@ def eqMk(data):
     
     dip_alpha = data['dip_alpha']
     
-    hrtf_path = data['hrtf_path']
+    #hrtf_path = data['hrtf_path']
 
     #=======================================================================
     
@@ -438,13 +441,13 @@ def eqMk(data):
     else:
         t_curve = np.zeros_like(freqs) + target
         
-    if os.path.isfile(hrtf_path):
-        df_hrtf = load_data(hrtf_path)
-        interpolator = interp1d(np.log10(df_hrtf['freq']), df_hrtf['gain'], kind='linear', fill_value="extrapolate")
-        hrtf_curve = interpolator(np.log10(freqs))
-        t_curve = t_curve + hrtf_curve
-    else:
-        t_curve = t_curve
+    #if os.path.isfile(hrtf_path):
+    #    df_hrtf = load_data(hrtf_path)
+    #    interpolator = interp1d(np.log10(df_hrtf['freq']), df_hrtf['gain'], kind='linear', fill_value="extrapolate")
+    #    hrtf_curve = interpolator(np.log10(freqs))
+    #    t_curve = t_curve + hrtf_curve
+    #else:
+    #    t_curve = t_curve
         
     for dip_freq in dip_freqs:
         dip_gains[dip_freqs == dip_freq] -= t_curve[freqs == dip_freq]

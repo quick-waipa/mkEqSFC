@@ -15,7 +15,7 @@ from pathlib import Path
 import eqCalc
 import eqMk
 
-Ver = "1.07"
+Ver = "1.08"
 
 # ウィンドウを閉じた際にPythonを終了する
 def close_window():
@@ -278,7 +278,7 @@ def calculate():
     
     
     # eqCalc.pyでslope+等ラウドネス曲線を適用した周波数特性データを作成=========
-    eqCalc.specCalc(file2_path, file3_path, output_folder, slope)
+    eqCalc.specCalc(file2_path, file3_path, output_folder, slope, hrtf_path)
     
     # EQデータ作成=======================================================
     # フラットターゲット--------------------------------------------------
@@ -300,7 +300,7 @@ def calculate():
             'output_folder':output_folder,
             'target_on':True,
             'dip_alpha':dip_alpha,
-            'hrtf_path':'',
+            #'hrtf_path':'',
     }
     eqMk.eqMk(data)
     
@@ -324,7 +324,7 @@ def calculate():
             'output_folder':output_folder,
             'target_on':True,
             'dip_alpha':dip_alpha,
-            'hrtf_path':hrtf_path,
+            #'hrtf_path':hrtf_path,
     }
     eqMk.eqMk(data2)
     
@@ -403,7 +403,7 @@ def main():
         'target': ' EQ Creating Target Level [dB]',
         'target_file': ' EQ Target Curve File Path',
         'dip_alpha':' How Much to Fill the Dip',
-        'hrtf_file':' HRTF - ECTF File Path',
+        'hrtf_file':' HRTF File Path',
     }
 
     # 各パラメータに対応するコメント文

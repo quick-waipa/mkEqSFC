@@ -5,6 +5,7 @@
 import os
 import shutil
 import numpy as np
+import pandas as pd
 import re
 import subprocess
 import matplotlib.pyplot as plt
@@ -12,6 +13,10 @@ import cmath
 from pathlib import Path
 from scipy.integrate import simps
 from scipy.interpolate import interp1d
+
+def load_data(file_path):
+    df = pd.read_csv(file_path, header=None, names=['freq', 'gain'])
+    return df
 
 def linear_interpolation(freq, gain, target_freq):
     # freqの中でtarget_freqに最も近い2つの周波数を見つける
@@ -34,12 +39,72 @@ def linear_interpolation(freq, gain, target_freq):
 
 #特に根拠はないがエンジニアリングセンスによってターゲットカーブのローとハイを削る関数
 def engineering_sense(freq, gain):
-    a_low = [-30, 4, 1.5, 0.2]
+    a_low = [-30, 3.6, 1.5, 0.2]
     a_hi  = [-2, 6, 1.5, 5]
     
-    gain_out = gain + a_low[0]*(a_low[2]/np.log10(freq) - a_low[3])**a_low[1] + a_hi[0]*(a_hi[2]/(np.log10(freq) - a_hi[3]))**a_hi[1]
+    #lo_filter_path = Path('data\lo_filter.csv')
+    #lo_filter = pd.read_csv(lo_filter_path)
+    
+    #interpolate = interp1d(lo_filter['Frequency'], lo_filter['Gain'], kind='linear', fill_value='extrapolate')
+    #lo_filter_gain = interpolate(freq)
+    
+    gain_out = gain + a_low[0]*(a_low[2]/np.log10(freq) - a_low[3])**a_low[1]  + a_hi[0]*(a_hi[2]/(np.log10(freq) - a_hi[3]))**a_hi[1]
     
     return gain_out
+
+def lo_pass(f0, gain, q, freq):
+    
+    w0 = 2 * np.pi * f0 / freq
+    w  = 2 * np.pi * 1
+    jw = np.zeros(len(freq)) + 1j * w
+    
+    b0 = w0**2 + 1j * np.zeros(len(freq))
+    a0 = w0**2 + 1j * np.zeros(len(freq))
+    a1 = w0/q + 1j * np.zeros(len(freq))
+    a2 = np.full(len(freq), 1) + 1j * np.zeros(len(freq))
+    
+    H = b0 / (a0 + a1 * jw + a2 * jw**2)
+    
+    output = np.abs(H)*gain
+    
+    return output
+
+def hi_pass(f0, gain, q, freq):
+    
+    w0 = 2 * np.pi * f0 / freq
+    w  = 2 * np.pi * 1
+    jw = np.zeros(len(freq)) + 1j * w
+    
+    b2 = np.full(len(freq), 1) + 1j * np.zeros(len(freq))
+    a0 = w0**2 + 1j * np.zeros(len(freq))
+    a1 = w0/q + 1j * np.zeros(len(freq))
+    a2 = np.full(len(freq), 1) + 1j * np.zeros(len(freq))
+
+    H = b2 * jw**2 / (a0 + a1 * jw + a2 * jw**2)
+    
+    output = np.abs(H)*gain
+    
+    return output
+
+#外耳道伝達関数の計算
+def ear_canal_transfer_function(freqs):
+    # Enamito, Hiruma (2012) 日本機械学会論文集（B 編）78巻789号
+    ro = 1.293       #空気密度[kg/m3]
+    D4 = 0.007       #外耳道直径[m]
+    S4 = D4**2*np.pi #外耳道の断面積[m2]
+    L4 = 0.0255       #外耳道長さ[m]
+    c  = 352.28      #耳の穴の中の音速 [m/sec]
+    Zd = np.sqrt(10)*ro*c #鼓膜インピーダンス
+    x  = L4 #測定位置
+    
+    ks  = 2 * np.pi * freqs / c #波数
+    
+    A = Zd*np.cos(ks*(L4 - x)) + 1j*ro*c*np.sin(ks*(L4 - x))
+    B = Zd*np.cos(ks*L4) + 1j*ro*c*np.sin(ks*L4)
+    
+    H_open = A/B
+    
+    return 6*np.log2(np.abs(H_open))
     
 
 # file read and setting--------------------------------------------------------------
@@ -181,7 +246,7 @@ def plot_eq_curve(data, output_folder):
     plt.figure(figsize=(8, 6))
     plt.xlabel('Frequency (Hz)')
     plt.ylabel('Gain (dB)')
-    plt.title('Filtered Frequency Response Data')
+    plt.title('Target Frequency Response Data')
     plt.xscale('log')
     plt.grid(True)
     plt.xlim(20, 20000)
@@ -191,23 +256,24 @@ def plot_eq_curve(data, output_folder):
     plt.grid(which="minor", color="gray", alpha=0.1)
 
     # データのプロット
-    plt.plot(data[:, 0], data[:, 1], label='Org FR', color='pink')
-    plt.plot(data[:, 0], data[:, 2], label='Slope', color='limegreen')
-    plt.plot(data[:, 0], data[:, 3], label='Filter', color='lightblue')
-    plt.plot(data[:, 0], data[:, 4], label='Filter - Slope', color='steelblue')
-    plt.plot(data[:, 0], data[:, 5], label='Filtered FR', color='tomato')
+    plt.plot(data[:, 0], data[:, 1], label='HRTF', color='lightblue')
+    plt.plot(data[:, 0], data[:, 2], label='ECTF', color='limegreen')
+    plt.plot(data[:, 0], data[:, 3], label='HRTF - ECTF', color='steelblue')
+    plt.plot(data[:, 0], data[:, 4], label='Org Target', color='pink')
+    plt.plot(data[:, 0], data[:, 5], label='Target', color='tomato')
+
 
     # 凡例の表示
     plt.legend()
 
     # グラフの保存
-    plt.savefig('filtered_FR_data_plot.png')
+    plt.savefig('target_FR_data_plot.png')
 
     # グラフの表示
     plt.close()
     
     # ファイルを移動し、上書きする
-    os.replace("filtered_FR_data_plot.png", output_folder.joinpath("filtered_FR_data_plot.png"))
+    os.replace("target_FR_data_plot.png", output_folder.joinpath("target_FR_data_plot.png"))
 
 # calcurate RMS -----------------------------------------------------------------------
 
@@ -257,7 +323,7 @@ def eqCalc(eq_path, target_path, k_filter_path, slope):
     
     return rms_k, rms_f, rms_diff
     
-def specCalc(file2_path, file3_path, output_folder, slope):
+def specCalc(file2_path, file3_path, output_folder, slope, hrtf_path):
     
     f_range = np.logspace(np.log10(20), np.log10(20000), 1000)
     
@@ -280,10 +346,18 @@ def specCalc(file2_path, file3_path, output_folder, slope):
     gain_tmp = linear_interpolation(f_range, target_curve_eqLoudness, 1000)
     target_curve_eqLoudness_std = target_curve_eqLoudness - gain_tmp
     
-    target_curve = apply_filter(k_filter_curve2, msp3_curve)
+    #頭部伝達関数 - 外耳道伝達関数
+    if os.path.isfile(hrtf_path):
+        df_hrtf = load_data(hrtf_path)
+        interpolator = interp1d(np.log10(df_hrtf['freq']), df_hrtf['gain'], kind='linear', fill_value="extrapolate")
+        hrtf_curve = interpolator(np.log10(f_range))
+        ectf_curve = ear_canal_transfer_function(f_range)
+        target_curve_eqLoudness_std2 = target_curve_eqLoudness_std + hrtf_curve - ectf_curve
+        data = np.column_stack((f_range, hrtf_curve, ectf_curve, hrtf_curve - ectf_curve, target_curve_eqLoudness_std, target_curve_eqLoudness_std2))
+        np.savetxt(output_folder.resolve().joinpath("target_curve_eqLoudness.txt"), data[:,[0,5]], delimiter=',', fmt='%.6f')
+        plot_eq_curve(data, output_folder)
+    else:
+        data = np.column_stack((f_range, target_curve_eqLoudness_std))
+        np.savetxt(output_folder.resolve().joinpath("target_curve_eqLoudness.txt"), data[:,[0,1]], delimiter=',', fmt='%.6f')
     
-    
-    data = np.column_stack((f_range, msp3_curve, slope_curve, k_filter_curve, k_filter_curve2, target_curve, target_curve_eqLoudness_std))
-    #np.savetxt(out_path, data[:,[0,5]], delimiter=',', fmt='%.6f')
-    np.savetxt(output_folder.resolve().joinpath("target_curve_eqLoudness.txt"), data[:,[0,6]], delimiter=',', fmt='%.6f')
-    #plot_eq_curve(data, output_folder)
+    #target_curve = apply_filter(k_filter_curve2, msp3_curve)
