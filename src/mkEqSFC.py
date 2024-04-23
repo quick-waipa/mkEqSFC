@@ -15,15 +15,15 @@ from pathlib import Path
 import eqCalc
 import eqMk
 
-Ver = "1.08"
+Ver = "1.09"
 
-# ウィンドウを閉じた際にPythonを終了する
+# Exit Python when window is closed
 def close_window():
     root.destroy()
     root.quit()
     
     
-# YAMLファイルからデータを読み込んでGUIに表示する関数
+# Function to read data from a YAML file and display it in the GUI
 def load_yaml():
     global data_config
     with open(config_file_path, "r", encoding="utf-8") as f:
@@ -32,7 +32,7 @@ def load_yaml():
     if data_config is None:
         data_config = {}
         
-    # GUI 上で表示する順番を指定する
+    # Specify the order in which they are displayed on the GUI
     order = [
         'output_folder',
         'data_file',
@@ -56,34 +56,33 @@ def load_yaml():
         'dip_alpha',
     ]
     
-    # data_config のキーの順序を取得し、それを parameter_order として使用
+    # Get the order of keys in data_config and use it as parameter_order
     global parameter_order
     parameter_order = list(order)
 
-            
+# Function to save data to a YAML file
 def save_yaml():
-    """YAMLファイルにデータを保存する関数"""
     with open(config_file_path, "w", encoding="utf-8") as f:
         yaml.dump(data_config, f)
 
+# Function to store data
 def save_data():
-    """データを保存する関数"""
     for key, entry in entries.items():
-        # 数値データの場合は float 型に変換して保存
+        # For numeric data, convert to float type and save
         if key == 'band_num':
             try:
                 data_config[key] = int(entry.get())
             except ValueError:
-                # 数値に変換できない場合はそのまま保存
+                # If it cannot be converted to numerical values, save as is
                 data_config[key] = entry.get()
         elif key in numeric_keys:
             try:
                 data_config[key] = float(entry.get())
             except ValueError:
-                # 数値に変換できない場合はそのまま保存
+                # If it cannot be converted to numerical values, save as is
                 data_config[key] = entry.get()
         else:
-            # 数値データでない場合はそのまま保存
+            # If it cannot be converted to numerical values, save as is
             data_config[key] = entry.get()
     save_yaml()       
     
@@ -95,8 +94,8 @@ def open_file_dialog(entry_widget):
         file_path = filedialog.askopenfilename(initialdir=Path.cwd())
         
     if file_path:
-        entry_widget.delete(0, tk.END)  # エントリウィジェットの現在の内容を削除
-        entry_widget.insert(0, file_path)  # 選択されたファイルパスを挿入
+        entry_widget.delete(0, tk.END)  # Delete current contents of entry widget
+        entry_widget.insert(0, file_path)  # Insert selected file path
 
 def open_folder_dialog(entry_widget):
     path = Path(entry_widget.get())
@@ -106,10 +105,10 @@ def open_folder_dialog(entry_widget):
         folder_path = filedialog.askdirectory(initialdir=Path.cwd())
         
     if folder_path:
-        entry_widget.delete(0, tk.END)  # エントリウィジェットの現在の内容を削除
-        entry_widget.insert(0, folder_path)  # 選択されたフォルダパスを挿入
+        entry_widget.delete(0, tk.END)  # Delete current contents of entry widget
+        entry_widget.insert(0, folder_path)  # Insert selected folder path
         
-#GUIを作成する関数----------------------------------------------------------------------------
+# Function to create GUI----------------------------------------------------------------------------
 def create_gui():
     global root
     root = ThemedTk(theme='adapta')
@@ -117,29 +116,29 @@ def create_gui():
     root.protocol("WM_DELETE_WINDOW", close_window)
     load_yaml()
     
-    # カスタムフォントを作成
-    font = ("Meiryo", 10)  # フォント名とサイズを指定
+    # Create custom fonts
+    font = ("Meiryo", 10)  # Specify font name and size
     font_b = ("consolas", 10, "bold")
-    # 日本語フォントを設定
+    # Set Japanese font
     font_jp = ("Meiryo", 10)
     
-    # ウィンドウのサイズ
+    # Window Size
     root.geometry("990x990")
     
-    #テーマ
+    # theme
     #s = ttk.Style()
     #s.theme_use('black')
     
-    # ウィンドウの高さを変更不可能にする
+    # Make window height unchangeable
     root.resizable(width=False, height=False)
     
-    # 各データを表示する間隔を設定するパディング
+    # Padding to set the interval at which each piece of data is displayed
     row_padding = 2
     
     parent = ttk.Frame(root)
     parent.pack(fill="both", expand="yes")
     
-    # 新しいラベルを作成して配置
+    # Create and place new labels
     ttk.Label(parent, text=' [Output Folder] --------------------------------------------------------------------------------------------------------------------------', font=font_b).grid(row=0, column=0, columnspan=3, sticky="w", pady=5, padx=0)
     ttk.Label(parent, text=' [Input Data] -----------------------------------------------------------------------------------------------------------------------------', font=font_b).grid(row=2, column=0, columnspan=3, sticky="w", pady=5, padx=0)
     ttk.Label(parent, text=' [Output File Name] -----------------------------------------------------------------------------------------------------------------------', font=font_b).grid(row=7, column=0, columnspan=3, sticky="w", pady=5, padx=0)
@@ -149,7 +148,7 @@ def create_gui():
     
     entry_frames = []
     
-    # 各データを表示
+    # Display each data
     row_index = 0
     for key in parameter_order:
         if row_index == 0 or row_index == 2 or row_index == 7 or row_index == 10 or row_index == 12:
@@ -195,29 +194,22 @@ def create_gui():
             
         row_index += 1
     
-    # Saveボタンを作成
+    # Create Save button
     button_save = ttk.Button(parent, text='Save to Config File', command=save_data)
     button_save.grid(row=row_index + 1, column=0, columnspan=3, pady=8)
     
-    # 「Run Calculate」ボタンを作成
+    # Create "Run Calculate" button
     button_ok = ttk.Button(parent, text='Run Calculate', command=calculate)
     button_ok.grid(row=row_index + 2, column=0, columnspan=3, pady=8)
     row_index += 1
     
-    # ウィンドウのリサイズに合わせてEntryの幅を広げる
-    #root.grid_columnconfigure(2, weight=1) # 列の調整
-    #entry_frames[0].grid_columnconfigure(0, weight=1) # 列の調整
-    #entry_frames[1].grid_columnconfigure(0, weight=1) # 列の調整
-    #entry_frames[2].grid_columnconfigure(0, weight=1) # 列の調整
-    #entry_frames[3].grid_columnconfigure(0, weight=1) # 列の調整
-    
     root.mainloop()
 
-#メインとなる計算-----------------------------------------------------------------------------
+# Main calculation-----------------------------------------------------------------------------
 def calculate():
     global data_config
     
-    """OKボタンが押されたときの処理"""
+    #Processing when the OK button is pressed
     save_data()
     
     with open(config_file_path,'r', encoding="utf-8") as f:
@@ -225,22 +217,22 @@ def calculate():
     
     #INPUT==========================================================================
     output_folder = Path(config['output_folder'])
-    k_file     = Path(config['k_file'])      #なんらかの特性フィルター（等LOUDNESS曲線など）のデータ
-    data_file  = Path(config['data_file'])   #入力データのファイル名を指定。周波数特性データ。 ※20～20000Hzのデータがないとエラーになる
-    #out        = str(config['out'])         #アウトプットファイル名を指定。slopeと特性フィルターを適用した周波数特性データ
-    slope      = float(config['slope'])       #ターゲット生成につかうスロープ[dB/oct] (ピンクノイズ:-3dB/oct)
+    k_file     = Path(config['k_file'])      
+    data_file  = Path(config['data_file'])   
+    #out        = str(config['out'])         
+    slope      = float(config['slope'])       
     hrtf_file  = Path(config['hrtf_file'])
     #================================================================================
-    band_num  =  int(config['band_num'])    # EQバンド数
-    eq1_file  =  str(config['eq1_file'])    #アウトプットファイル名を指定。REW形式のeq filterファイル。(フラットターゲットのもの)
-    eq2_file  =  str(config['eq2_file'])    #アウトプットファイル名を指定。REW形式のeq filterファイル。(slope + 特性フィルターを適用したターゲットのもの)
-    model_str =  str(config['data_file'])   #eq filterファイルの中に書き込むコメント
+    band_num  =  int(config['band_num'])    
+    eq1_file  =  str(config['eq1_file'])    
+    eq2_file  =  str(config['eq2_file'])   
+    model_str =  str(config['data_file'])  
 
-    max_q     =  float(config['max_q']) # Q値の最大値
-    min_q     =  float(config['min_q']) # Q値の最小値
-    default_q =  float(config['default_q']) # エラーになったときにとりあえず設定するQ値
+    max_q     =  float(config['max_q'])
+    min_q     =  float(config['min_q']) 
+    default_q =  float(config['default_q']) 
 
-    window_oct = float(config['window_oct'])  # ガウス関数でフィッティングするときにどのくらいのオクターブ幅を参照するかという値 [oct]
+    window_oct = float(config['window_oct'])  
     
     low_cutoff1 = float(config['low_cutoff1'])  # Low frequency cutoff [Hz]
     high_cutoff1 = float(config['high_cutoff1'])  # High frequency cutoff [Hz]
@@ -248,16 +240,16 @@ def calculate():
     low_cutoff2 = float(config['low_cutoff2'])  # Low frequency cutoff [Hz]
     high_cutoff2 = float(config['high_cutoff2'])  # High frequency cutoff [Hz]
 
-    target = float(config['target']) #EQ生成のときのターゲットゲインレベル [dB]
+    target = float(config['target']) 
     target_file = Path(config['target_file'])
     
-    dip_alpha = float(config['dip_alpha']) #ディップをどれだけ埋めるかのパラメータ(0.0～1.0)
+    dip_alpha = float(config['dip_alpha']) 
 
     
-    # スクリプトファイルのディレクトリを取得
+    # Get script file directory
     script_dir = Path.cwd()
     
-    # ファイルパスを絶対パス化
+    # Make file paths absolute
     file2_path   = k_file.resolve()
     file3_path   = data_file.resolve()
     target_path  = target_file.resolve()
@@ -277,11 +269,11 @@ def calculate():
     
     
     
-    # eqCalc.pyでslope+等ラウドネス曲線を適用した周波数特性データを作成=========
+    # Frequency response data with slope+ iso-loudness curve applied in eqCalc.py=========
     eqCalc.specCalc(file2_path, file3_path, output_folder, slope, hrtf_path)
     
-    # EQデータ作成=======================================================
-    # フラットターゲット--------------------------------------------------
+    # EQ Data Creation=======================================================
+    # flat target--------------------------------------------------
     eq1_path   = output_folder.joinpath(eq1_file)
 
     data = {'band_num':band_num,
@@ -304,7 +296,7 @@ def calculate():
     }
     eqMk.eqMk(data)
     
-    # slope - 等ラウドネス曲線ターゲット-------------------------------------
+    # slope - equal loudness curve target-------------------------------------
     eq2_path   = output_folder.joinpath(eq2_file)
     
     data2 = {'band_num':band_num,
@@ -328,7 +320,7 @@ def calculate():
     }
     eqMk.eqMk(data2)
     
-    #eqCalc.pyでEQフィルター適用後のゲインの増減を計算===========================
+    #Calculate gain increase/decrease after applying EQ filter in eqCalc.py===========================
     print("================================================")
     print("Calculate RMS")
     print("================================================")
@@ -364,15 +356,15 @@ def calculate():
         f.write("rms_diff:              [dB]: " + str(rms_diff2) + "\n")
         f.write("------------------------------------------------\n")
     
-    # ファイルを移動し、上書きする
+    # Move and overwrite files
     os.replace("rms.txt", output_folder.joinpath("rms.txt"))
     
     print("Calculation completed successfully.")
     
     
-#メイン関数--------------------------------------------------------------------------------------------
+# main function--------------------------------------------------------------------------------------------
 def main():
-    # GUIを作成して実行する
+    # Create and run a GUI
     global config_file_path
     global entries, data_config, numeric_keys, parameter_descriptions, param_com, folder_path_keys, file_path_keys, file_name_keys
     entries = {}
@@ -382,7 +374,7 @@ def main():
                     'window_oct', 'low_cutoff1', 'high_cutoff1',
                     'low_cutoff2', 'high_cutoff2', 'target']
     
-    # 各パラメータのタイトル
+    # Title of each parameter
     parameter_descriptions = {
         'output_folder': ' Output Folder Path',
         'k_file': ' Filter Data File Path',
@@ -406,31 +398,30 @@ def main():
         'hrtf_file':' HRTF File Path',
     }
 
-    # 各パラメータに対応するコメント文
+    # Comment text corresponding to each parameter
     param_com = {
         'output_folder': '',
         'k_file': '',
         'data_file': '',
         'hrtf_file':'',
-        #'out': '特性フィルター適用後の周波数特性データの保存ファイル名',
-        'slope': 'リファレンス音源のスロープ。(参考：ピンクノイズ：-3 dB/oct)',
-        'band_num': 'EQバンド数',
-        'eq1_file': 'EQデータ（通常Ve.）の保存ファイル名',
-        'eq2_file': 'EQデータ（特性フィルター適用Ver.）の保存ファイル名',
-        'max_q': 'Q値の最大値',
-        'min_q': 'Q値の最小値',
-        'default_q': '計算がエラーになったときにとりあえず設定するQ値',
-        'window_oct': 'ガウス関数フィッティング時にサンプリングする周波数幅',
-        'low_cutoff1': 'EQ（通常Ver.）作成時の周波数カットオフ下限値',
-        'high_cutoff1': 'EQ（通常Ver.）作成時の周波数カットオフ上限値',
-        'low_cutoff2': 'EQ（特性フィルター適用Ver.）作成時の周波数カットオフ下限値',
-        'high_cutoff2': 'EQ（特性フィルター適用Ver.）作成時の周波数カットオフ上限値',
-        'target': 'EQ作成時のターゲットレベル',
+        'slope': 'Slope of reference sound source.(Reference: Pink noise: -3 dB/oct)',
+        'band_num': 'Number of EQ Bands',
+        'eq1_file': 'File name for saving EQ data (normal Ve.)',
+        'eq2_file': 'File name for saving EQ data (filter applied ver.)',
+        'max_q': 'Maximum Q-value',
+        'min_q': 'Minimum Q value',
+        'default_q': 'Q value to be set for now in case of calculation error',
+        'window_oct': 'Frequency range to be sampled during Gaussian fitting',
+        'low_cutoff1': 'Lower limit of frequency cutoff when creating EQ (normal Ver.)',
+        'high_cutoff1': 'Upper frequency cutoff limit when creating EQ (normal Ver.)',
+        'low_cutoff2': 'Lower limit of frequency cutoff when creating EQ (filtered ver.)',
+        'high_cutoff2': 'Upper frequency cutoff limit when creating EQ (filtered ver.)',
+        'target': 'Target level when creating EQ',
         'target_file': '',
-        'dip_alpha':'ディップをどれだけ埋めるか(0.0～1.0)',
+        'dip_alpha':'How much to fill the dip (0.0 to 1.0)',
     }
     
-    # ファイルパスを選択できるデータのキー
+    # Key to data from which file paths can be selected
     folder_path_keys = ['output_folder']
     file_path_keys = ['k_file', 'data_file', 'target_file', 'hrtf_file']
     #file_name_keys = ['out','eq1_file','eq2_file']

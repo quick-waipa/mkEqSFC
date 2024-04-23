@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------------
-# eqfilter前後のゲイン[dB]の比較プログラム
+# Comparison program of gain [dB] before and after eqfilter
 #-------------------------------------------------------------------------------------
 
 import os
@@ -19,25 +19,25 @@ def load_data(file_path):
     return df
 
 def linear_interpolation(freq, gain, target_freq):
-    # freqの中でtarget_freqに最も近い2つの周波数を見つける
+    # Find the two frequencies in freq that are closest to target_freq
     idx = 0
     while idx < len(freq) - 1 and freq[idx + 1] < target_freq:
         idx += 1
     
-    # 線形補間
-    if idx == len(freq) - 1:  # 最後の要素の場合
+    # linear interpolation
+    if idx == len(freq) - 1:  # For the last element
         interpolated_gain = gain[idx]
     else:
-        # 2つの周波数と対応するgainを取得
+        # Get two frequencies and the corresponding GAIN
         freq_lower, freq_upper = freq[idx], freq[idx + 1]
         gain_lower, gain_upper = gain[idx], gain[idx + 1]
         
-        # 線形補間
+        # linear interpolation
         interpolated_gain = gain_lower + (gain_upper - gain_lower) * ((target_freq - freq_lower) / (freq_upper - freq_lower))
     
     return interpolated_gain
 
-#特に根拠はないがエンジニアリングセンスによってターゲットカーブのローとハイを削る関数
+# Functions that shave the low and high of the target curve by engineering sense, although there is no particular rationale for this.
 def engineering_sense(freq, gain):
     a_low = [-30, 3.6, 1.5, 0.2]
     a_hi  = [-2, 6, 1.5, 5]
@@ -86,18 +86,18 @@ def hi_pass(f0, gain, q, freq):
     
     return output
 
-#外耳道伝達関数の計算
+# Calculation of the ear canal transfer function
 def ear_canal_transfer_function(freqs):
-    # Enamito, Hiruma (2012) 日本機械学会論文集（B 編）78巻789号
-    ro = 1.293       #空気密度[kg/m3]
-    D4 = 0.007       #外耳道直径[m]
-    S4 = D4**2*np.pi #外耳道の断面積[m2]
-    L4 = 0.0255       #外耳道長さ[m]
-    c  = 352.28      #耳の穴の中の音速 [m/sec]
-    Zd = np.sqrt(10)*ro*c #鼓膜インピーダンス
-    x  = L4 #測定位置
+    # Enamito, Hiruma (2012) Transactions of the Japan Society of Mechanical Engineers (Volume B), Vol. 78, No. 789
+    ro = 1.293       #Air density [kg/m3]
+    D4 = 0.007       #Diameter of ear canal [m].
+    S4 = D4**2*np.pi #Cross-sectional area of ear canal [m2].
+    L4 = 0.0255       #Length of ear canal [m].
+    c  = 352.28      #Speed of sound in ear canal [m/sec].
+    Zd = np.sqrt(10)*ro*c #tympanic impedance
+    x  = L4 #Measurement position
     
-    ks  = 2 * np.pi * freqs / c #波数
+    ks  = 2 * np.pi * freqs / c #wavenumber
     
     A = Zd*np.cos(ks*(L4 - x)) + 1j*ro*c*np.sin(ks*(L4 - x))
     B = Zd*np.cos(ks*L4) + 1j*ro*c*np.sin(ks*L4)
@@ -242,7 +242,7 @@ def apply_filter(filter_curve, msp3_curve):
 # Plot the curves---------------------------------------------------------------
 def plot_eq_curve(data, output_folder):
     
-    # プロット設定
+    # plot setting
     plt.figure(figsize=(8, 6))
     plt.xlabel('Frequency (Hz)')
     plt.ylabel('Gain (dB)')
@@ -255,7 +255,7 @@ def plot_eq_curve(data, output_folder):
     plt.grid(which="major", color="black", alpha=0.5)
     plt.grid(which="minor", color="gray", alpha=0.1)
 
-    # データのプロット
+    # Plotting Data
     plt.plot(data[:, 0], data[:, 1], label='HRTF', color='lightblue')
     plt.plot(data[:, 0], data[:, 2], label='ECTF', color='limegreen')
     plt.plot(data[:, 0], data[:, 3], label='HRTF - ECTF', color='steelblue')
@@ -263,16 +263,16 @@ def plot_eq_curve(data, output_folder):
     plt.plot(data[:, 0], data[:, 5], label='Target', color='tomato')
 
 
-    # 凡例の表示
+    # Show legend
     plt.legend()
 
-    # グラフの保存
+    # Saving Graphs
     plt.savefig('target_FR_data_plot.png')
 
-    # グラフの表示
+    # Graph Display
     plt.close()
     
-    # ファイルを移動し、上書きする
+    # Move and overwrite files
     os.replace("target_FR_data_plot.png", output_folder.joinpath("target_FR_data_plot.png"))
 
 # calcurate RMS -----------------------------------------------------------------------
@@ -341,12 +341,12 @@ def specCalc(file2_path, file3_path, output_folder, slope, hrtf_path):
     k_filter_curve2 = apply_slope(k_filter_curve, slope_curve)
     
     #target_curve_eqLoudness = -k_filter_curve2
-    target_curve_eqLoudness = engineering_sense(f_range, -k_filter_curve2) #エンジニアリングセンスによりローとハイを削ったもの
+    target_curve_eqLoudness = engineering_sense(f_range, -k_filter_curve2) #Low and high shaved off by engineering sense
     
     gain_tmp = linear_interpolation(f_range, target_curve_eqLoudness, 1000)
     target_curve_eqLoudness_std = target_curve_eqLoudness - gain_tmp
     
-    #頭部伝達関数 - 外耳道伝達関数
+    #Head transfer function - External auditory canal transfer function
     if os.path.isfile(hrtf_path):
         df_hrtf = load_data(hrtf_path)
         interpolator = interp1d(np.log10(df_hrtf['freq']), df_hrtf['gain'], kind='linear', fill_value="extrapolate")

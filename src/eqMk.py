@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------------
-# 周波数特性データから音場補正用のeqfilterを生成するプログラム
+# Program to generate eqfilter for sound field correction from frequency response data
 #-------------------------------------------------------------------------------------
 
 import os
@@ -40,20 +40,20 @@ def remove_duplicates(df):
     return df_no_duplicates
 
 def linear_interpolation(freq, gain, target_freq):
-    # freqの中でtarget_freqに最も近い2つの周波数を見つける
+    # Find the two frequencies in freq that are closest to target_freq
     idx = 0
     while idx < len(freq) - 1 and freq[idx + 1] < target_freq:
         idx += 1
     
-    # 線形補間
-    if idx == len(freq) - 1:  # 最後の要素の場合
+    # linear interpolation
+    if idx == len(freq) - 1:  # For the last element
         interpolated_gain = gain[idx]
     else:
-        # 2つの周波数と対応するgainを取得
+        # Get two frequencies and the corresponding GAIN
         freq_lower, freq_upper = freq[idx], freq[idx + 1]
         gain_lower, gain_upper = gain[idx], gain[idx + 1]
         
-        # 線形補間
+        # linear interpolation
         interpolated_gain = gain_lower + (gain_upper - gain_lower) * ((target_freq - freq_lower) / (freq_upper - freq_lower))
     
     return interpolated_gain
@@ -112,20 +112,20 @@ def find_dips(df, low_cutoff, high_cutoff):
     gains = filtered_df['gain'].to_numpy()
     gains_inverted = -gains
     
-    # 移動平均を求める
+    # Find the moving average
     window_size = int(len(freqs)/3)
     smoothed_gains = np.convolve(gains_inverted, np.ones(window_size)/window_size, mode='same')
 
-    # 周波数特性から移動平均を差し引く
+    # Subtract moving average from frequency response
     adjusted_gains = gains_inverted[:len(smoothed_gains)] - smoothed_gains
     
     std_gains = adjusted_gains / adjusted_gains.max()
     
     peaks, _ = find_peaks(std_gains, height=0.3)
     
-    # ピーク同士の間隔を計算し、近接するピークを除外する
-    min_peak_distance = 0.5  # ピーク同士の最小間隔 [oct]
-    filtered_peaks = [peaks[0]]  # 最初のピークは必ず残す
+    # Calculate the distance between peaks and exclude peaks that are close together
+    min_peak_distance = 0.5  # Minimum peak-to-peak spacing [oct].
+    filtered_peaks = [peaks[0]]  # Always leave the first peak
     for i in range(1, len(peaks)):
         if np.log2(freqs[peaks[i]]) - np.log2(freqs[peaks[i-1]]) >= min_peak_distance:
             filtered_peaks.append(peaks[i])
@@ -143,17 +143,6 @@ def find_dips(df, low_cutoff, high_cutoff):
     for i in range(len(dips)):
         q_value = estimate_q_value(filtered_df, dips[i], dip_gains[i], 0.1, 8, 1, 4)
         q_values.append(q_value + 2)    
-    
-    # プロット
-    #plt.plot(freqs, adjusted_gains)
-    #plt.plot(freqs, gains_inverted, label='Original Gain')
-    #plt.plot(freqs, smoothed_gains, label='Smoothed Gain (4th-order)')
-    #plt.xlabel('Frequency')
-    #plt.ylabel('Gain')
-    #plt.title('Smoothed Frequency Response')
-    #plt.xscale('log')
-    #plt.legend()
-    #plt.show()
     
     return dips, dip_gains, q_values
 
@@ -187,10 +176,10 @@ def find_peak_and_dip(df, df_t):
     #tg_min = df_t.loc[df_t['freq'] == min_g_freq, 'gain'].values[0]
     
     
-    if abs(max_g) > abs(min_g): #ピークがターゲットの場合
+    if abs(max_g) > abs(min_g): #If the peak is the target
         # Peak is further from the target gain
         return max_g_freq, df.loc[df['freq'] == max_g_freq, 'gain'].values[0]
-    else: #ディップがターゲットの場合
+    else: #If the dip is the target
         # Dip is further from the target gain
         return min_g_freq, df.loc[df['freq'] == min_g_freq, 'gain'].values[0]
     
@@ -328,7 +317,7 @@ def plot_data_and_curve(freqs, gains0, gains, eq_curve, t_curve, out, output_fol
     eq_curve = np.column_stack((freqs, eq_curve))
     t_curve = np.column_stack((freqs, t_curve))
 
-    # プロット設定
+    # plot setting
     plt.figure(figsize=(8, 6))
     plt.xlabel('Frequency (Hz)')
     plt.ylabel('Gain (dB)')
@@ -341,24 +330,24 @@ def plot_data_and_curve(freqs, gains0, gains, eq_curve, t_curve, out, output_fol
     plt.grid(which="major", color="black", alpha=0.5)
     plt.grid(which="minor", color="gray", alpha=0.1)
 
-    # データのプロット
+    # Plotting Data
     plt.plot(t_curve[:, 0], t_curve[:, 1], '--', label='Target Curve', color='tomato')
     plt.plot(data[:, 0], data[:, 1], label='Frequency Respons', color='lightblue', linewidth=2)
     plt.plot(eq_curve[:, 0], eq_curve[:, 1], label='EQ Curve', color='deeppink', linewidth=1)
     plt.plot(eqd_data[:, 0], eqd_data[:, 1], label='EQd Frequency Respons', color='steelblue', linewidth=2)
 
-    # 凡例の表示
+    # Show legend
     plt.legend()
 
-    # グラフの保存
+    # Saving Graphs
     plt.savefig('equalization_data_plot.png')
 
-    # グラフの表示
+    # Graph Display
     plt.close()
     
     os.rename("equalization_data_plot.png" ,out + "equalization_data_plot.png" )
     
-    # ファイルを移動し、上書きする
+    # Move and overwrite files
     os.replace(out + "equalization_data_plot.png", output_folder.joinpath(out + "equalization_data_plot.png"))
     
     
@@ -386,22 +375,22 @@ def eqMk(data):
     
     #INPUT================================================================
 
-    band_num = data['band_num'] #30 # EQバンド数
+    band_num = data['band_num'] 
 
-    file_path = data['file_path'] #周波数特性データ
+    file_path = data['file_path'] 
     out_path  = data['out_path'] #eq filter
-    model_str = data['model_str'] #eq filterファイルの中に書き込むコメント
+    model_str = data['model_str'] 
 
-    max_q     = data['max_q'] # 8 # Q値の最大値
-    min_q     = data['min_q'] # 1 # Q値の最小値
-    default_q = data['default_q'] # 4 # エラーになったときにとりあえず設定するQ値
+    max_q     = data['max_q'] 
+    min_q     = data['min_q'] 
+    default_q = data['default_q'] 
 
-    window_oct = data['window_oct'] # 0.1  # ガウス関数でフィッティングするときにどのくらいのオクターブ幅を参照するかという値 [oct]
+    window_oct = data['window_oct'] 
     
-    low_cutoff = data['low_cutoff'] #80  # Low frequency cutoff [Hz]
-    high_cutoff = data['high_cutoff'] #3000  # High frequency cutoff [Hz]
+    low_cutoff = data['low_cutoff'] 
+    high_cutoff = data['high_cutoff'] 
 
-    target = data['target'] #-3 #ターゲットゲインレベル [dB]
+    target = data['target'] 
     target_path = data['target_path']
     
     out = data['out']
@@ -424,7 +413,7 @@ def eqMk(data):
     
     df_curve = df_no_duplicates
     
-    #1000Hzのgainで規格化
+    #Standardized at 1000Hz gain
     gain_tmp = linear_interpolation(df_curve['freq'].to_numpy(), df_curve['gain'].to_numpy(), 1000)
     df_curve.loc[:, 'gain'] -= gain_tmp
     
@@ -440,14 +429,6 @@ def eqMk(data):
         t_curve = t_curve + target
     else:
         t_curve = np.zeros_like(freqs) + target
-        
-    #if os.path.isfile(hrtf_path):
-    #    df_hrtf = load_data(hrtf_path)
-    #    interpolator = interp1d(np.log10(df_hrtf['freq']), df_hrtf['gain'], kind='linear', fill_value="extrapolate")
-    #    hrtf_curve = interpolator(np.log10(freqs))
-    #    t_curve = t_curve + hrtf_curve
-    #else:
-    #    t_curve = t_curve
         
     for dip_freq in dip_freqs:
         dip_gains[dip_freqs == dip_freq] -= t_curve[freqs == dip_freq]
