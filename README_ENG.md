@@ -24,6 +24,8 @@ https://note.com/waipa/n/ncecf0fcbd168
    - Compatible with headphone correction
 - Ver.1.08 2024/04/22
    - Modified to calculate the ear canal transfer function in the code.
+- Ver.1.09 2024/04/23
+   - All comment text, etc., is in English because it may cause errors in some environments.
 - Test Environment: 
    - Windows 10 22H2 (Python 3.11.5)
    - Ubuntu 22.04.3 LTS (Python 3.10.12)
@@ -88,6 +90,7 @@ Note: If you plan to execute the program on Linux, it might be advisable to repl
 ***
 
 ## Input Data:
+![InputImage](image/input.png)
 #### [Output Folder]
  + **Output Folder Path:** Please input the path to the folder where output files will be stored.
  
