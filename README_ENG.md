@@ -86,7 +86,6 @@ You can also create an executable file with
 - Linux: `sh build.sh`  
 
 Note: Please place `config.yaml` in the same folder as the executable file.  
-Note: If you plan to execute the program on Linux, it might be advisable to replace the Japanese fonts in the `create_gui()` function of `mkEqSFC.py.`
 ***
 
 ## Input Data:
