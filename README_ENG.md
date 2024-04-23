@@ -1,4 +1,5 @@
 # mkEqSFC
+![OutputImage](output/f_equalization_data_plot.png)
 [日本語版 README はこちら](https://github.com/quick-waipa/mkEqSFC/blob/main/README.md)
 
 note article： I created my own sound field correction program for speakers (Japanese).：  
