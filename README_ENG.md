@@ -120,6 +120,14 @@ Note: Please place `config.yaml` in the same folder as the executable file.
  + **How Much to Fill the Dip:** You can specify how much to fill the dip (0.0 to 1.0).
  
 ***
+## Tips：
+- For "filtered" targets, you may not want to match the curve too much to peaks above 5000 Hz. The more you match it, the more shimmering it will be.
+- I feel that if the target is to be flattened, the dip should not be filled too much.
+- It may be better not to overfill the dip, especially for headphones, since the dip may exist out of necessity.
+- It seems to me that the correct adjustment is to be able to listen to it in its own way, no matter which way you swing the alpha all the way.
+- Of course, the results vary considerably depending on the measurement. It may be a good idea to try various methods, such as taking multiple measurements and averaging them.
+ 
+***
 ## Author
 - Quick-Waqipa
 - HP: https://quickwaipa.web.fc2.com/
