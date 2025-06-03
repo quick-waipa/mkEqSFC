@@ -2,9 +2,6 @@
 ![OutputImage](output/f_equalization_data_plot.png)
 
 [English README is here](https://github.com/quick-waipa/mkEqSFC/blob/main/README_ENG.md)  
-
-note記事：スピーカーの音場補正プログラムを自作してみた：  
-https://note.com/waipa/n/ncecf0fcbd168
     
 ***
 - Ver.1.00 2024/04/15
